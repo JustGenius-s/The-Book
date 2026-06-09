@@ -2,7 +2,18 @@ extends Node
 
 enum GameMode { NONE, STORY, AUTOCHESS, CARD_BATTLE }
 
+const DEFAULT_LOBBY_BG := "res://assets/ui/main_menu_bg_default.png"
+
 var current_mode: GameMode = GameMode.NONE
+var _lobby_bg_path: String = DEFAULT_LOBBY_BG
+
+
+func set_lobby_bg(path: String) -> void:
+	_lobby_bg_path = path
+
+
+func get_lobby_bg_path() -> String:
+	return _lobby_bg_path
 
 
 func enter_story_mode() -> void:
