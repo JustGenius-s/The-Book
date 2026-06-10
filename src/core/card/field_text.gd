@@ -1,15 +1,21 @@
 class_name FieldText
 extends RefCounted
 
-## 字段（状态）文案工具：
+## 字段/场地文案工具：
 ## - 根据 FieldEntry.effects 自动生成效果说明
-## - 把技能描述里出现的字段名渲染成带悬浮提示的 BBCode
+## - 把技能描述里的字段名和场地名渲染成可点击链接（[url] 标签）
+## - 提供 lookup(url) 统一解析链接，返回详情 BBCode
 
 const FIELDS_DIR := "res://data/fields"
+const TERRAINS_DIR := "res://data/terrains"
+
+const URL_FIELD := "field:"
+const URL_TERRAIN := "terrain:"
 
 const BUFF_COLOR := "#7ec97e"
 const DEBUFF_COLOR := "#e88a6a"
 const SPECIAL_COLOR := "#8fb8de"
+const TERRAIN_COLOR := "#c9a0dc"   # 场地名用淡紫色区分
 
 const TARGET_NAMES := {
 	SkillData.TargetType.SELF: "自身",
@@ -86,23 +92,45 @@ static func collect_skill_fields(skill: SkillData) -> Array[FieldEntry]:
 	return result
 
 
-## 把技能描述渲染为 BBCode：字段名高亮 + 下划线，悬浮显示字段效果
+## 技能涉及的场地（terrain_to_create 引用的场地）
+static func collect_skill_terrains(skill: SkillData) -> Array[TerrainData]:
+	if skill.terrain_to_create == "":
+		return []
+	var path := "%s/%s.tres" % [TERRAINS_DIR, skill.terrain_to_create]
+	if not ResourceLoader.exists(path):
+		return []
+	var terrain := load(path) as TerrainData
+	if terrain == null:
+		return []
+	return [terrain]
+
+
+## 把技能描述渲染为 BBCode：字段名/场地名高亮 + 下划线，点击查看详情
 static func decorate_description(skill: SkillData) -> String:
 	var text := skill.description
+
+	# 场地链接
+	for terrain: TerrainData in collect_skill_terrains(skill):
+		if terrain.display_name == "" or not text.contains(terrain.display_name):
+			continue
+		var decorated := "[url=%s%s][color=%s][u]%s[/u][/color][/url]" % [
+			URL_TERRAIN, terrain.id, TERRAIN_COLOR, terrain.display_name,
+		]
+		text = text.replace(terrain.display_name, decorated)
+
+	# 字段链接
 	for field: FieldEntry in collect_skill_fields(skill):
 		if field.display_name == "" or not text.contains(field.display_name):
 			continue
-		var decorated := "[hint=%s：%s][color=%s][u]%s[/u][/color][/hint]" % [
-			field.display_name,
-			describe(field),
-			_color_of(field),
-			field.display_name,
+		var decorated := "[url=%s%s][color=%s][u]%s[/u][/color][/url]" % [
+			URL_FIELD, field.id, _color_of(field), field.display_name,
 		]
 		text = text.replace(field.display_name, decorated)
+
 	return text
 
 
-## 技能详情 BBCode：标题（目标 · 冷却）+ 字段高亮描述。图鉴与战斗详情共用。
+## 技能详情 BBCode：标题（目标 · 冷却）+ 字段/场地高亮描述。图鉴与战斗详情共用。
 static func skill_bbcode(skill: SkillData) -> String:
 	var cd_text := "冷却 %d 回合" % skill.cooldown if skill.cooldown > 0 else "普通攻击"
 	var text := "[b]%s[/b]（%s · %s）" % [
@@ -113,6 +141,54 @@ static func skill_bbcode(skill: SkillData) -> String:
 	if skill.description != "":
 		text += "\n" + decorate_description(skill)
 	return text
+
+
+## 根据点击链接（如 field:burn），返回对应的详情 BBCode；找不到返回空
+static func lookup(url: String) -> String:
+	if url.begins_with(URL_FIELD):
+		return _field_detail(url.trim_prefix(URL_FIELD))
+	elif url.begins_with(URL_TERRAIN):
+		return _terrain_detail(url.trim_prefix(URL_TERRAIN))
+	return ""
+
+
+static func _field_detail(id: String) -> String:
+	var path := "%s/%s.tres" % [FIELDS_DIR, id]
+	if not ResourceLoader.exists(path):
+		return ""
+	var field := load(path) as FieldEntry
+	if field == null:
+		return ""
+	return "[b]%s[/b]（%s）\n%s" % [
+		field.display_name,
+		_badge_of(field),
+		describe(field),
+	]
+
+
+static func _terrain_detail(id: String) -> String:
+	var path := "%s/%s.tres" % [TERRAINS_DIR, id]
+	if not ResourceLoader.exists(path):
+		return ""
+	var terrain := load(path) as TerrainData
+	if terrain == null:
+		return ""
+
+	var lines: PackedStringArray = ["[b]场地：%s[/b]" % terrain.display_name]
+	lines.append(terrain.description)
+	for field: FieldEntry in terrain.global_fields:
+		lines.append("「%s」%s" % [field.display_name, describe(field)])
+	return "\n".join(lines)
+
+
+static func _badge_of(field: FieldEntry) -> String:
+	match field.type:
+		FieldEntry.FieldType.BUFF:
+			return "增益"
+		FieldEntry.FieldType.DEBUFF:
+			return "减益"
+		_:
+			return "特殊"
 
 
 static func _fill(template: String, value: float) -> String:

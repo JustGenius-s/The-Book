@@ -12,6 +12,10 @@ const UNOWNED_TINT := Color(0.3, 0.3, 0.3)
 @onready var _detail_owned: Label = $DetailOverlay/Center/Panel/HBox/Info/OwnedLabel
 @onready var _detail_stats: Label = $DetailOverlay/Center/Panel/HBox/Info/StatsLabel
 @onready var _detail_skills: RichTextLabel = $DetailOverlay/Center/Panel/HBox/Info/SkillsLabel
+@onready var _detail_tooltip: PanelContainer = $DetailOverlay/Tooltip
+@onready var _detail_tooltip_text: RichTextLabel = $DetailOverlay/Tooltip/HBox/Text
+@onready var _tooltip_bg: ColorRect = $DetailOverlay/TooltipBg
+@onready var _tooltip_close: Button = $DetailOverlay/Tooltip/HBox/CloseBtn
 
 
 func _ready() -> void:
@@ -19,6 +23,12 @@ func _ready() -> void:
 	$DetailOverlay/Center/Panel/HBox/Info/CloseButton.pressed.connect(
 		func() -> void: _detail_overlay.visible = false
 	)
+	_detail_skills.meta_clicked.connect(_on_detail_meta_clicked)
+	_tooltip_bg.gui_input.connect(func(_e: InputEvent) -> void:
+		if _e is InputEventMouseButton and _e.pressed:
+			_hide_skill_tooltip()
+	)
+	_tooltip_close.pressed.connect(_hide_skill_tooltip)
 
 	_gold_label.text = "金币：%d" % SaveManager.player.get_currency("gold")
 	_populate_grid()
@@ -81,7 +91,27 @@ func _show_detail(card: CardData, owned: bool) -> void:
 
 	_detail_skills.clear()
 	for skill: SkillData in card.skills:
-		# 字段名高亮展示，悬浮可查看字段效果
 		_detail_skills.append_text("%s\n\n" % FieldText.skill_bbcode(skill))
 
 	_detail_overlay.visible = true
+	_hide_skill_tooltip()
+
+
+func _hide_skill_tooltip() -> void:
+	_detail_tooltip.visible = false
+	_tooltip_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _show_skill_tooltip() -> void:
+	_detail_tooltip.visible = true
+	_tooltip_bg.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _on_detail_meta_clicked(meta: String) -> void:
+	var info := FieldText.lookup(meta)
+	if info == "":
+		return
+	_detail_tooltip_text.clear()
+	_detail_tooltip_text.append_text(info)
+	_show_skill_tooltip()
+

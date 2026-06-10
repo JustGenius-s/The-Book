@@ -1,7 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://collection01"]
+[gd_scene load_steps=4 format=3 uid="uid://collection01"]
 
 [ext_resource type="Theme" uid="uid://do1sna6jhrvx7" path="res://assets/ui/themes/ui.tres" id="1_theme"]
 [ext_resource type="Script" path="res://src/ui/collection/collection_screen.gd" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+bg_color = Color(0.08, 0.08, 0.14, 0.92)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.55, 0.6)
 
 [node name="CollectionScreen" type="Control"]
 layout_mode = 3
@@ -84,6 +96,16 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.7)
 
+[node name="TooltipBg" type="ColorRect" parent="DetailOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.01)
+mouse_filter = 2
+
 [node name="Center" type="CenterContainer" parent="DetailOverlay"]
 layout_mode = 1
 anchors_preset = 15
@@ -129,9 +151,37 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 15
 bbcode_enabled = true
+selection_enabled = true
 fit_content = true
 
 [node name="CloseButton" type="Button" parent="DetailOverlay/Center/Panel/HBox/Info"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "关闭"
+
+[node name="Tooltip" type="PanelContainer" parent="DetailOverlay"]
+visible = false
+layout_mode = 1
+anchor_left = 0.15
+anchor_top = 0.78
+anchor_right = 0.85
+anchor_bottom = 0.95
+theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
+
+[node name="HBox" type="HBoxContainer" parent="DetailOverlay/Tooltip"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Text" type="RichTextLabel" parent="DetailOverlay/Tooltip/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(400, 0)
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+fit_content = true
+
+[node name="CloseBtn" type="Button" parent="DetailOverlay/Tooltip/HBox"]
+layout_mode = 2
+text = "x"
+custom_minimum_size = Vector2(36, 36)
+size_flags_vertical = 4

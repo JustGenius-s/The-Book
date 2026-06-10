@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cardbattle01"]
+[gd_scene load_steps=6 format=3 uid="uid://cardbattle01"]
 
 [ext_resource type="Theme" uid="uid://do1sna6jhrvx7" path="res://assets/ui/themes/ui.tres" id="1_theme"]
 [ext_resource type="Script" path="res://src/card_battle/card_battle_mode.gd" id="2_mode"]
@@ -14,6 +14,18 @@ content_margin_left = 12.0
 content_margin_top = 10.0
 content_margin_right = 12.0
 content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+bg_color = Color(0.08, 0.08, 0.14, 0.92)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.55, 0.6)
 
 [node name="CardBattleMode" type="Control"]
 layout_mode = 3
@@ -168,7 +180,38 @@ custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 14
 bbcode_enabled = true
+selection_enabled = true
 fit_content = true
+
+[node name="DetailTooltipBg" type="ColorRect" parent="BottomRight"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 3
+color = Color(0, 0, 0, 0.01)
+mouse_filter = 2
+
+[node name="DetailTooltip" type="PanelContainer" parent="BottomRight"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
+
+[node name="HBox" type="HBoxContainer" parent="BottomRight/DetailTooltip"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Text" type="RichTextLabel" parent="BottomRight/DetailTooltip/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(400, 0)
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+fit_content = true
+
+[node name="CloseBtn" type="Button" parent="BottomRight/DetailTooltip/HBox"]
+layout_mode = 2
+text = "x"
+custom_minimum_size = Vector2(36, 36)
+size_flags_vertical = 4
 
 [node name="HintLabel" type="Label" parent="BottomRight"]
 layout_mode = 2

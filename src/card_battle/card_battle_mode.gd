@@ -20,6 +20,10 @@ const CURRENT_FRAME_COLOR := Color(1.0, 0.9, 0.3)
 @onready var _order_bar: VBoxContainer = $OrderBar
 @onready var _detail_panel: PanelContainer = $BottomRight/DetailPanel
 @onready var _detail_text: RichTextLabel = $BottomRight/DetailPanel/DetailText
+@onready var _battle_tooltip: PanelContainer = $BottomRight/DetailTooltip
+@onready var _battle_tooltip_text: RichTextLabel = $BottomRight/DetailTooltip/HBox/Text
+@onready var _battle_tooltip_bg: ColorRect = $BottomRight/DetailTooltipBg
+@onready var _battle_tooltip_close: Button = $BottomRight/DetailTooltip/HBox/CloseBtn
 @onready var _hint_label: Label = $BottomRight/HintLabel
 @onready var _skill_icons: HBoxContainer = $BottomRight/SkillIcons
 @onready var _log_drawer: PanelContainer = $LogDrawer
@@ -62,6 +66,13 @@ func _ready() -> void:
 	_manager.action_requested.connect(_on_action_requested)
 	_manager.action_order_changed.connect(_refresh_order_bar)
 	_manager.battle_ended.connect(_on_battle_ended)
+
+	_detail_text.meta_clicked.connect(_on_battle_detail_meta_clicked)
+	_battle_tooltip_bg.gui_input.connect(func(_e: InputEvent) -> void:
+		if _e is InputEventMouseButton and _e.pressed:
+			_hide_battle_tooltip()
+	)
+	_battle_tooltip_close.pressed.connect(_hide_battle_tooltip)
 
 	_show_team_select()
 
@@ -448,6 +459,26 @@ func _show_skill_detail(skill: SkillData) -> void:
 	_detail_text.clear()
 	_detail_text.append_text(FieldText.skill_bbcode(skill))
 	_detail_panel.visible = true
+	_hide_battle_tooltip()
+
+
+func _hide_battle_tooltip() -> void:
+	_battle_tooltip.visible = false
+	_battle_tooltip_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _show_battle_tooltip() -> void:
+	_battle_tooltip.visible = true
+	_battle_tooltip_bg.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _on_battle_detail_meta_clicked(meta: String) -> void:
+	var info := FieldText.lookup(meta)
+	if info == "":
+		return
+	_battle_tooltip_text.clear()
+	_battle_tooltip_text.append_text(info)
+	_show_battle_tooltip()
 
 
 func _cast(skill: SkillData, target: BattleUnit) -> void:
@@ -467,6 +498,7 @@ func _end_input_phase() -> void:
 	for child in _skill_icons.get_children():
 		child.queue_free()
 	_detail_panel.visible = false
+	_hide_battle_tooltip()
 	_hint_label.visible = false
 
 
