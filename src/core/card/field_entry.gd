@@ -5,6 +5,7 @@ enum FieldType { BUFF, DEBUFF, SPECIAL }
 enum FieldSource { SKILL, TERRAIN, EQUIPMENT }
 
 @export var id: String
+@export var display_name: String
 @export var type: FieldType = FieldType.BUFF
 @export var source: FieldSource = FieldSource.SKILL
 @export var duration: int = -1
@@ -24,6 +25,7 @@ func is_expired() -> bool:
 func duplicate_entry() -> FieldEntry:
 	var copy := FieldEntry.new()
 	copy.id = id
+	copy.display_name = display_name
 	copy.type = type
 	copy.source = source
 	copy.duration = duration

@@ -3,20 +3,38 @@ extends Node
 
 signal battle_started
 signal turn_started(turn_number: int)
-signal unit_action(unit: BattleUnit, skill: SkillData, result: SkillExecutor.SkillResult)
+signal unit_acting(unit: BattleUnit, skill: SkillData, targets: Array[BattleUnit])
+signal unit_action(attacker: BattleUnit, skill: SkillData, target: BattleUnit, result: SkillExecutor.SkillResult)
+signal unit_stunned(unit: BattleUnit)
 signal turn_ended(turn_number: int)
 signal battle_ended(winner: String)
+## 轮到我方单位且处于手动模式时发出，UI 应调用 submit_action() 提交行动
+signal action_requested(unit: BattleUnit)
+signal action_submitted
 
 enum BattleState { IDLE, RUNNING, FINISHED }
+
+## 每次行动之间的停顿，让战斗过程可以被观看
+@export var action_delay: float = 0.9
+## 攻击动画起手到结算之间的停顿
+@export var pre_hit_delay: float = 0.25
+## 回合之间的停顿
+@export var turn_delay: float = 0.5
 
 var state: BattleState = BattleState.IDLE
 var turn_number: int = 0
 var global_fields: FieldContainer = FieldContainer.new()
 var terrain_manager: TerrainManager
+## 自动模式下我方单位由 AI 行动；敌方始终 AI
+var auto_mode: bool = false
 
 var _ally_units: Array[BattleUnit] = []
 var _enemy_units: Array[BattleUnit] = []
 var _all_units: Array[BattleUnit] = []
+var _waiting_for_input: bool = false
+var _waiting_unit: BattleUnit
+var _pending_skill: SkillData
+var _pending_target: BattleUnit
 
 
 func setup_battle(
@@ -26,10 +44,19 @@ func setup_battle(
 	enemy_equips: Array[Array],
 	initial_terrain: TerrainData = null,
 ) -> void:
+	for unit: BattleUnit in _all_units:
+		if is_instance_valid(unit):
+			unit.queue_free()
+
 	state = BattleState.IDLE
 	turn_number = 0
 	global_fields = FieldContainer.new()
 	terrain_manager = TerrainManager.new(global_fields)
+
+	# 若上一场战斗的协程还在等待玩家输入，唤醒它让其因 state 变化而退出
+	if _waiting_for_input:
+		_waiting_for_input = false
+		action_submitted.emit()
 
 	_ally_units.clear()
 	_enemy_units.clear()
@@ -59,6 +86,53 @@ func setup_battle(
 		terrain_manager.set_terrain(initial_terrain)
 
 
+func get_ally_units() -> Array[BattleUnit]:
+	return _ally_units
+
+
+func get_enemy_units() -> Array[BattleUnit]:
+	return _enemy_units
+
+
+func is_ally(unit: BattleUnit) -> bool:
+	return _ally_units.has(unit)
+
+
+## 该技能是否需要玩家手动指定目标
+func needs_manual_target(skill: SkillData) -> bool:
+	return skill.target == SkillData.TargetType.SINGLE_ENEMY \
+		or skill.target == SkillData.TargetType.SINGLE_ALLY
+
+
+## 当前可被该技能选中的目标列表（供 UI 高亮）
+func get_valid_targets(unit: BattleUnit, skill: SkillData) -> Array[BattleUnit]:
+	var enemies := _enemy_units if is_ally(unit) else _ally_units
+	var allies := _ally_units if is_ally(unit) else _enemy_units
+	var pool := enemies if skill.target == SkillData.TargetType.SINGLE_ENEMY else allies
+	var result: Array[BattleUnit] = []
+	for u: BattleUnit in pool:
+		if u.is_alive:
+			result.append(u)
+	return result
+
+
+## UI 提交玩家选择的行动；target 仅对单体技能有意义
+func submit_action(skill: SkillData, target: BattleUnit = null) -> void:
+	if not _waiting_for_input:
+		return
+	_pending_skill = skill
+	_pending_target = target
+	_waiting_for_input = false
+	action_submitted.emit()
+
+
+func set_auto_mode(enabled: bool) -> void:
+	auto_mode = enabled
+	# 正在等玩家输入时切自动，立刻由 AI 代为行动
+	if enabled and _waiting_for_input and _waiting_unit:
+		submit_action(_select_skill(_waiting_unit), null)
+
+
 func start_battle() -> void:
 	state = BattleState.RUNNING
 	battle_started.emit()
@@ -73,6 +147,8 @@ func _run_battle() -> void:
 		var action_order := _get_action_order()
 
 		for unit: BattleUnit in action_order:
+			if state != BattleState.RUNNING:
+				return
 			if not unit.is_alive:
 				continue
 
@@ -83,16 +159,44 @@ func _run_battle() -> void:
 				continue
 
 			if _is_stunned(unit):
+				unit_stunned.emit(unit)
+				await _wait(action_delay * 0.6)
+				if state != BattleState.RUNNING:
+					return
 				continue
 
-			var skill := _select_skill(unit)
+			var skill: SkillData
+			var targets: Array[BattleUnit]
+
+			if is_ally(unit) and not auto_mode:
+				_waiting_for_input = true
+				_waiting_unit = unit
+				action_requested.emit(unit)
+				await action_submitted
+				_waiting_unit = null
+				if state != BattleState.RUNNING:
+					return
+				skill = _pending_skill
+				targets = _resolve_player_targets(unit, skill, _pending_target)
+			else:
+				skill = _select_skill(unit)
+				targets = _select_targets(unit, skill)
+
 			if skill == null:
 				continue
 
-			var targets := _select_targets(unit, skill)
+			unit_acting.emit(unit, skill, targets)
+			await _wait(pre_hit_delay)
+			if state != BattleState.RUNNING:
+				return
+
 			_execute_action(unit, skill, targets)
 
 			if _check_battle_end():
+				return
+
+			await _wait(action_delay)
+			if state != BattleState.RUNNING:
 				return
 
 		for unit: BattleUnit in _all_units:
@@ -105,6 +209,15 @@ func _run_battle() -> void:
 		if turn_number >= 100:
 			_finish_battle("draw")
 			return
+
+		await _wait(turn_delay)
+
+
+func _wait(seconds: float) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	await tree.create_timer(seconds).timeout
 
 
 func _get_action_order() -> Array[BattleUnit]:
@@ -158,6 +271,16 @@ func _select_targets(unit: BattleUnit, skill: SkillData) -> Array[BattleUnit]:
 	return result
 
 
+## 玩家手选目标合法时优先使用，否则退回 AI 规则（群体/自身技能也走这里）
+func _resolve_player_targets(unit: BattleUnit, skill: SkillData, chosen: BattleUnit) -> Array[BattleUnit]:
+	if skill == null:
+		return []
+	if chosen != null and is_instance_valid(chosen) and chosen.is_alive and needs_manual_target(skill):
+		var result: Array[BattleUnit] = [chosen]
+		return result
+	return _select_targets(unit, skill)
+
+
 func _execute_action(attacker: BattleUnit, skill: SkillData, targets: Array[BattleUnit]) -> void:
 	attacker.put_skill_on_cooldown(skill)
 
@@ -165,6 +288,7 @@ func _execute_action(attacker: BattleUnit, skill: SkillData, targets: Array[Batt
 		var result := SkillExecutor.execute(
 			skill,
 			attacker.get_final_stat("atk"),
+			target.get_final_stat("def"),
 			attacker.field_container,
 			target.field_container,
 			global_fields,
@@ -174,7 +298,7 @@ func _execute_action(attacker: BattleUnit, skill: SkillData, targets: Array[Batt
 			target.take_damage(result.damage)
 
 		if result.heal > 0:
-			attacker.heal(result.heal)
+			target.heal(result.heal)
 
 		for field: FieldEntry in result.fields_for_target:
 			target.field_container.add_field(field)
@@ -199,7 +323,7 @@ func _execute_action(attacker: BattleUnit, skill: SkillData, targets: Array[Batt
 		if not target.is_alive:
 			_process_equip_triggers(attacker, EquipTrigger.TriggerEvent.ON_KILL, target)
 
-		unit_action.emit(attacker, skill, result)
+		unit_action.emit(attacker, skill, target, result)
 
 
 func _process_equip_triggers(unit: BattleUnit, event: EquipTrigger.TriggerEvent, other: BattleUnit) -> void:

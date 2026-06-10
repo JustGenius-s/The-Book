@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_tern0"]
+[ext_resource type="Resource" path="res://data/cards/wukong_demon.tres" id="2_5w653"]
+[ext_resource type="Resource" path="res://data/cards/wukong_bima.tres" id="3_dr77h"]
+[ext_resource type="Resource" path="res://data/cards/wukong_dragon.tres" id="4_ix8wm"]
+[ext_resource type="Script" path="res://src/card_battle/encounter_data.gd" id="5_gt7tx"]
+[ext_resource type="Resource" path="res://data/terrains/huaguo_mountain.tres" id="6_3tb5p"]
+
+[resource]
+script = ExtResource("5_gt7tx")
+id = "demo_battle"
+display_name = "花果山试炼"
+enemy_cards = Array[ExtResource("1_tern0")]([ExtResource("2_5w653"), ExtResource("3_dr77h"), ExtResource("4_ix8wm")])
+terrain = ExtResource("6_3tb5p")
+reward_gold = 200

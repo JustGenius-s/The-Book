@@ -12,13 +12,13 @@ func change_scene(scene_path: String) -> void:
 
 
 func _deferred_change_scene(scene_path: String) -> void:
-	if _current_scene:
-		_current_scene.free()
-
 	var new_scene := ResourceLoader.load(scene_path) as PackedScene
 	if new_scene == null:
 		push_error("SceneManager: failed to load scene '%s'" % scene_path)
 		return
+
+	if _current_scene:
+		_current_scene.free()
 
 	_current_scene = new_scene.instantiate()
 	get_tree().root.add_child(_current_scene)

@@ -31,6 +31,10 @@ func enter_card_battle_mode() -> void:
 	SceneManager.change_scene("res://src/card_battle/card_battle_mode.tscn")
 
 
+func enter_collection() -> void:
+	SceneManager.change_scene("res://src/ui/collection/collection_screen.tscn")
+
+
 func return_to_main_menu() -> void:
 	current_mode = GameMode.NONE
 	SceneManager.change_scene("res://src/main/main.tscn")

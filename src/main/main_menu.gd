@@ -26,3 +26,7 @@ func _on_btn_auto_chess_pressed() -> void:
 
 func _on_btn_card_battle_pressed() -> void:
 	GameManager.enter_card_battle_mode()
+
+
+func _on_btn_collection_pressed() -> void:
+	GameManager.enter_collection()

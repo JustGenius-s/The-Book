@@ -8,6 +8,7 @@ extends RefCounted
 static func execute(
 	skill: SkillData,
 	attacker_atk: int,
+	target_def: int,
 	attacker_fields: FieldContainer,
 	target_fields: FieldContainer,
 	global_fields: FieldContainer,
@@ -21,11 +22,14 @@ static func execute(
 
 		var damage_boost := FieldResolver.get_effect_value("damage_bonus_percent", attacker_fields, global_fields)
 		var damage_reduction := FieldResolver.get_effect_value("damage_reduction_percent", target_fields, global_fields)
+		# 防御减伤：def 越高承伤越低（def=100 时约减伤 26%）
+		var def_factor := 1000.0 / (1000.0 + float(maxi(0, target_def)) * 3.5)
 
 		var raw_damage := float(attacker_atk) * multiplier
+		raw_damage *= def_factor
 		raw_damage *= (1.0 + damage_boost)
 		raw_damage *= maxf(0.0, 1.0 - damage_reduction)
-		result.damage = int(raw_damage)
+		result.damage = maxi(1, int(raw_damage))
 
 	# --- Heal calculation ---
 	if skill.heal_multiplier > 0.0:

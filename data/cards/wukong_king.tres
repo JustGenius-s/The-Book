@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/美猴王.png" id="1_vchoi"]
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_0vnpy"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_io3xp"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_481v0"]
+[ext_resource type="Resource" path="res://data/fields/burn.tres" id="5_y1wwo"]
+
+[sub_resource type="Resource" id="Resource_t16w2"]
+script = ExtResource("3_io3xp")
+id = "ruyi_staff"
+display_name = "如意金箍棒"
+description = "挥舞金箍棒攻击单个敌人。"
+
+[sub_resource type="Resource" id="Resource_adlsb"]
+script = ExtResource("3_io3xp")
+id = "ruyi_sweep"
+display_name = "如意神通"
+target = 2
+cooldown = 3
+damage_multiplier = 0.85
+fields_to_apply = Array[ExtResource("4_481v0")]([ExtResource("5_y1wwo")])
+condition = 1
+condition_field_id = "burn"
+conditional_bonus_multiplier = 0.3
+description = "攻击所有敌人并施加灼烧；对已灼烧的目标伤害提升 30%。"
+
+[resource]
+script = ExtResource("2_0vnpy")
+id = "wukong_king"
+display_name = "美猴王"
+book_id = "journey_to_the_west"
+rarity = 4
+base_hp = 1100
+base_atk = 175
+base_def = 60
+base_spd = 112
+skills = Array[ExtResource("3_io3xp")]([SubResource("Resource_t16w2"), SubResource("Resource_adlsb")])
+portrait = ExtResource("1_vchoi")

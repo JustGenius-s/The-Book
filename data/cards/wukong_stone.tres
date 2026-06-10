@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/石猴.png" id="1_pbdse"]
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_j4l5a"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_esrd8"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_wmg5i"]
+[ext_resource type="Resource" path="res://data/fields/stone_skin.tres" id="5_jd2py"]
+
+[sub_resource type="Resource" id="Resource_5ep4i"]
+script = ExtResource("3_esrd8")
+id = "throw_rock"
+display_name = "投石"
+damage_multiplier = 0.8
+description = "投掷山石攻击单个敌人。"
+
+[sub_resource type="Resource" id="Resource_vj3p6"]
+script = ExtResource("3_esrd8")
+id = "stone_guard"
+display_name = "磐石庇护"
+target = 4
+cooldown = 3
+damage_multiplier = 0.0
+fields_to_apply = Array[ExtResource("4_wmg5i")]([ExtResource("5_jd2py")])
+description = "为全体队友施加磐石之躯，受到的伤害降低 25%。"
+
+[resource]
+script = ExtResource("2_j4l5a")
+id = "wukong_stone"
+display_name = "石猴"
+book_id = "journey_to_the_west"
+rarity = 2
+base_hp = 1400
+base_atk = 105
+base_def = 95
+base_spd = 88
+skills = Array[ExtResource("3_esrd8")]([SubResource("Resource_5ep4i"), SubResource("Resource_vj3p6")])
+portrait = ExtResource("1_pbdse")

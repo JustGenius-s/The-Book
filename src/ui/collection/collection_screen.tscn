@@ -1,0 +1,137 @@
+[gd_scene load_steps=3 format=3 uid="uid://collection01"]
+
+[ext_resource type="Theme" uid="uid://do1sna6jhrvx7" path="res://assets/ui/themes/ui.tres" id="1_theme"]
+[ext_resource type="Script" path="res://src/ui/collection/collection_screen.gd" id="2_script"]
+
+[node name="CollectionScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.08, 0.12, 1)
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+
+[node name="BackButton" type="Button" parent="TopBar"]
+layout_mode = 2
+text = "返回主菜单"
+
+[node name="Title" type="Label" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "卡牌图鉴"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="TopBar"]
+layout_mode = 2
+text = ""
+vertical_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.03
+anchor_top = 0.12
+anchor_right = 0.97
+anchor_bottom = 0.97
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Grid" type="GridContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 5
+
+[node name="DetailOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="DetailOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Center" type="CenterContainer" parent="DetailOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="DetailOverlay/Center"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="DetailOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Portrait" type="TextureRect" parent="DetailOverlay/Center/Panel/HBox"]
+custom_minimum_size = Vector2(260, 300)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="DetailOverlay/Center/Panel/HBox"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = ""
+
+[node name="OwnedLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
+layout_mode = 2
+text = ""
+
+[node name="StatsLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
+layout_mode = 2
+text = ""
+
+[node name="SkillsLabel" type="RichTextLabel" parent="DetailOverlay/Center/Panel/HBox/Info"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+fit_content = true
+
+[node name="CloseButton" type="Button" parent="DetailOverlay/Center/Panel/HBox/Info"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "关闭"

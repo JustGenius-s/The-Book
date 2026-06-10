@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_svf74"]
+
+[resource]
+script = ExtResource("1_svf74")
+id = "stone_skin"
+display_name = "磐石之躯"
+duration = 2
+effects = {
+"damage_reduction_percent": 0.25
+}

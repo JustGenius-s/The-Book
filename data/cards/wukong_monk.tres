@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/取经猴.png" id="1_x5i6u"]
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_oe8sy"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_o3x4m"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_6sjby"]
+
+[sub_resource type="Resource" id="Resource_gcccl"]
+script = ExtResource("3_o3x4m")
+id = "zen_staff"
+display_name = "禅杖"
+damage_multiplier = 0.7
+description = "用禅杖敲击单个敌人。"
+
+[sub_resource type="Resource" id="Resource_5ueej"]
+script = ExtResource("3_o3x4m")
+id = "salvation"
+display_name = "普度众生"
+target = 4
+cooldown = 3
+damage_multiplier = 0.0
+heal_multiplier = 1.5
+fields_to_remove = Array[String](["burn"])
+description = "治疗全体队友并驱散灼烧。"
+
+[resource]
+script = ExtResource("2_oe8sy")
+id = "wukong_monk"
+display_name = "取经猴"
+book_id = "journey_to_the_west"
+rarity = 3
+base_hp = 1050
+base_atk = 115
+base_def = 70
+skills = Array[ExtResource("3_o3x4m")]([SubResource("Resource_gcccl"), SubResource("Resource_5ueej")])
+portrait = ExtResource("1_x5i6u")

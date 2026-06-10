@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_atj5q"]
+
+[resource]
+script = ExtResource("1_atj5q")
+id = "stun"
+display_name = "眩晕"
+type = 1
+duration = 1
+effects = {
+"stun": 1.0
+}

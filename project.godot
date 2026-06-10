@@ -20,6 +20,8 @@ config/icon="res://icon.svg"
 EventBus="*res://src/core/event_bus.gd"
 SceneManager="*res://src/main/scene_manager.gd"
 GameManager="*res://src/main/game_manager.gd"
+CardLibrary="*res://src/core/card/card_library.gd"
+SaveManager="*res://src/core/save/save_manager.gd"
 
 [display]
 

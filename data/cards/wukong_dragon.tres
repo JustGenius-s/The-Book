@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/龙宫猴.png" id="1_nujwt"]
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_tvber"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_oib2b"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_hwqbb"]
+[ext_resource type="Resource" path="res://data/fields/tide_slow.tres" id="5_60n2d"]
+
+[sub_resource type="Resource" id="Resource_asvox"]
+script = ExtResource("3_oib2b")
+id = "water_arrow"
+display_name = "水箭"
+damage_multiplier = 0.85
+description = "射出水箭攻击单个敌人。"
+
+[sub_resource type="Resource" id="Resource_okb83"]
+script = ExtResource("3_oib2b")
+id = "dragon_tide"
+display_name = "龙宫秘术"
+target = 5
+cooldown = 3
+damage_multiplier = 1.2
+fields_to_apply = Array[ExtResource("4_hwqbb")]([ExtResource("5_60n2d")])
+description = "随机重击一名敌人并使其速度降低 30%。"
+
+[resource]
+script = ExtResource("2_tvber")
+id = "wukong_dragon"
+display_name = "龙宫猴"
+book_id = "journey_to_the_west"
+rarity = 3
+base_hp = 1000
+base_atk = 110
+base_def = 65
+base_spd = 95
+skills = Array[ExtResource("3_oib2b")]([SubResource("Resource_asvox"), SubResource("Resource_okb83")])
+portrait = ExtResource("1_nujwt")

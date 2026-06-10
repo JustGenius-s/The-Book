@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_28glf"]
+
+[resource]
+script = ExtResource("1_28glf")
+id = "tide_slow"
+display_name = "潮缚"
+type = 1
+duration = 2
+effects = {
+"spd_percent": -0.3
+}

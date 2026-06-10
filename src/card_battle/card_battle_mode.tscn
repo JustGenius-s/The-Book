@@ -1,0 +1,224 @@
+[gd_scene load_steps=4 format=3 uid="uid://cardbattle01"]
+
+[ext_resource type="Theme" uid="uid://do1sna6jhrvx7" path="res://assets/ui/themes/ui.tres" id="1_theme"]
+[ext_resource type="Script" path="res://src/card_battle/card_battle_mode.gd" id="2_mode"]
+[ext_resource type="Script" path="res://src/card_battle/card_battle_manager.gd" id="3_manager"]
+
+[node name="CardBattleMode" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("2_mode")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.08, 0.12, 1)
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+
+[node name="BackButton" type="Button" parent="TopBar"]
+layout_mode = 2
+text = "返回主菜单"
+
+[node name="TurnLabel" type="Label" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "回合 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TerrainLabel" type="Label" parent="TopBar"]
+layout_mode = 2
+text = ""
+vertical_alignment = 1
+
+[node name="AutoCheck" type="CheckButton" parent="TopBar"]
+layout_mode = 2
+text = "自动"
+
+[node name="EnemyRow" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchor_top = 0.1
+anchor_right = 1.0
+anchor_bottom = 0.42
+grow_horizontal = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="AllyRow" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchor_top = 0.46
+anchor_right = 1.0
+anchor_bottom = 0.78
+grow_horizontal = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="ActionPanel" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchor_top = 0.785
+anchor_right = 1.0
+anchor_bottom = 0.85
+grow_horizontal = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="HintLabel" type="Label" parent="ActionPanel"]
+layout_mode = 2
+text = ""
+vertical_alignment = 1
+
+[node name="SkillButtons" type="HBoxContainer" parent="ActionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="LogPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.02
+anchor_top = 0.865
+anchor_right = 0.98
+anchor_bottom = 0.99
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Log" type="RichTextLabel" parent="LogPanel"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 14
+scroll_following = true
+
+[node name="TeamSelectOverlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="TeamSelectOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Center" type="CenterContainer" parent="TeamSelectOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="TeamSelectOverlay/Center"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="TeamSelectOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="TeamSelectOverlay/Center/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "选择出战卡牌（最多 3 张）"
+horizontal_alignment = 1
+
+[node name="CardGrid" type="HBoxContainer" parent="TeamSelectOverlay/Center/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="TeamSelectOverlay/Center/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="TeamSelectOverlay/Center/Panel/VBox/Buttons"]
+layout_mode = 2
+text = "出战"
+
+[node name="MenuButton" type="Button" parent="TeamSelectOverlay/Center/Panel/VBox/Buttons"]
+layout_mode = 2
+text = "返回主菜单"
+
+[node name="ResultOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="ResultOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="ResultOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="ResultOverlay/Center"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="ResultOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="ResultLabel" type="Label" parent="ResultOverlay/Center/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "胜利！"
+horizontal_alignment = 1
+
+[node name="RewardLabel" type="Label" parent="ResultOverlay/Center/Panel/VBox"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="ResultOverlay/Center/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="RestartButton" type="Button" parent="ResultOverlay/Center/Panel/VBox/Buttons"]
+layout_mode = 2
+text = "重新编队"
+
+[node name="MenuButton" type="Button" parent="ResultOverlay/Center/Panel/VBox/Buttons"]
+layout_mode = 2
+text = "返回主菜单"
+
+[node name="BattleManager" type="Node" parent="."]
+script = ExtResource("3_manager")

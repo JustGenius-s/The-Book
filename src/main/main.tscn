@@ -65,3 +65,4 @@ text = "卡牌图鉴"
 [connection signal="pressed" from="VBoxContainer/BtnStory" to="." method="_on_btn_story_pressed"]
 [connection signal="pressed" from="VBoxContainer/BtnAutoChess" to="." method="_on_btn_auto_chess_pressed"]
 [connection signal="pressed" from="VBoxContainer/BtnCardBattle" to="." method="_on_btn_card_battle_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnCollection" to="." method="_on_btn_collection_pressed"]
