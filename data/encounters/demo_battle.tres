@@ -1,14 +1,14 @@
 [gd_resource type="Resource" script_class="EncounterData" format=3]
 
 [ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_tern0"]
-[ext_resource type="Resource" path="res://data/cards/wukong_demon.tres" id="2_5w653"]
-[ext_resource type="Resource" path="res://data/cards/wukong_bima.tres" id="3_dr77h"]
-[ext_resource type="Resource" path="res://data/cards/wukong_dragon.tres" id="4_ix8wm"]
+[ext_resource type="Resource" path="res://data/cards/huangdi.tres" id="2_hd"]
+[ext_resource type="Resource" path="res://data/cards/zhuanxu.tres" id="3_zx"]
+[ext_resource type="Resource" path="res://data/cards/diku.tres" id="4_dk"]
 [ext_resource type="Script" path="res://src/card_battle/encounter_data.gd" id="5_gt7tx"]
 
 [resource]
 script = ExtResource("5_gt7tx")
 id = "demo_battle"
-display_name = "花果山试炼"
-enemy_cards = Array[ExtResource("1_tern0")]([ExtResource("2_5w653"), ExtResource("3_dr77h"), ExtResource("4_ix8wm")])
+display_name = "上古试炼"
+enemy_cards = Array[ExtResource("1_tern0")]([ExtResource("2_hd"), ExtResource("3_zx"), ExtResource("4_dk")])
 reward_gold = 200

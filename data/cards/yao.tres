@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="3_fe"]
+[ext_resource type="Resource" path="res://data/fields/war_cry.tres" id="4_wc"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/yao/yao.png" id="5_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "abdicate"
+display_name = "禅让"
+target = 3
+cooldown = 3
+heal_multiplier = 0.2
+fields_to_apply = Array[ExtResource("3_fe")]([ExtResource("4_wc")])
+description = "将帝位禅让贤能，为一名友方恢复生命并施加战吼。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "benevolent_rule"
+display_name = "仁政"
+target = 4
+cooldown = 4
+heal_multiplier = 0.25
+description = "施行仁政，为全体友方恢复生命。"
+
+[resource]
+script = ExtResource("1_card")
+id = "yao"
+display_name = "尧"
+book_id = "journey_to_the_west"
+character_id = "yao"
+rarity = 4
+base_hp = 1400
+base_atk = 85
+base_def = 100
+base_spd = 90
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("5_portrait")

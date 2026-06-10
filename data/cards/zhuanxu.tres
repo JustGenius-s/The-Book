@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/zhuanxu/zhuanxu.png" id="3_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "sever_heaven_earth"
+display_name = "绝地天通"
+target = 2
+cooldown = 4
+damage_multiplier = 0.8
+terrain_to_create = "flame_domain"
+description = "断绝天地通道，攻击全体敌人并将场地化为焰天火场。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "divine_might"
+display_name = "神威"
+target = 1
+cooldown = 2
+damage_multiplier = 1.4
+description = "彰显神威，对单个敌人造成高额伤害。"
+
+[resource]
+script = ExtResource("1_card")
+id = "zhuanxu"
+display_name = "颛顼"
+book_id = "journey_to_the_west"
+character_id = "zhuanxu"
+rarity = 4
+base_hp = 1350
+base_atk = 145
+base_def = 85
+base_spd = 95
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("3_portrait")

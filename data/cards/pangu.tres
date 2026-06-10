@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/pangu/pangu.png" id="3_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "split_heaven_earth"
+display_name = "开天辟地"
+target = 2
+cooldown = 4
+damage_multiplier = 0.9
+description = "挥斧劈开混沌，对全体敌人造成伤害。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "chaos_power"
+display_name = "混沌之力"
+target = 0
+cooldown = 3
+description = "汲取混沌之力，提升自身攻击力。"
+fields_to_self = []
+
+[resource]
+script = ExtResource("1_card")
+id = "pangu"
+display_name = "盘古"
+book_id = "journey_to_the_west"
+character_id = "pangu"
+rarity = 5
+base_hp = 1800
+base_atk = 190
+base_def = 100
+base_spd = 60
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("3_portrait")

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/shennong/shennong.png" id="3_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "hundred_herbs"
+display_name = "百草"
+target = 3
+cooldown = 2
+heal_multiplier = 0.5
+fields_to_remove = Array[String](["burn"])
+description = "尝遍百草而知药性，为一名友方恢复大量生命并移除灼烧。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "taste_poison"
+display_name = "尝毒"
+target = 3
+cooldown = 3
+fields_to_remove = Array[String](["burn", "stun", "tide_slow"])
+description = "以身试毒，为一名友方驱散多种负面效果。"
+
+[resource]
+script = ExtResource("1_card")
+id = "shennong"
+display_name = "神农"
+book_id = "journey_to_the_west"
+character_id = "shennong"
+rarity = 4
+base_hp = 1300
+base_atk = 100
+base_def = 80
+base_spd = 100
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("3_portrait")

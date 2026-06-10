@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="3_fe"]
+[ext_resource type="Resource" path="res://data/fields/stone_skin.tres" id="4_ss"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/nuwa/nuwa.png" id="5_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "mend_sky"
+display_name = "补天"
+target = 4
+cooldown = 4
+heal_multiplier = 0.4
+description = "炼五色石以补苍天，为全体友方恢复生命。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "create_life"
+display_name = "抟土造人"
+target = 3
+cooldown = 3
+fields_to_apply = Array[ExtResource("3_fe")]([ExtResource("4_ss")])
+description = "抟黄土造人，为一名友方施加磐石之躯，降低所受伤害。"
+
+[resource]
+script = ExtResource("1_card")
+id = "nuwa"
+display_name = "女娲"
+book_id = "journey_to_the_west"
+character_id = "nuwa"
+rarity = 5
+base_hp = 1600
+base_atk = 90
+base_def = 110
+base_spd = 85
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("5_portrait")

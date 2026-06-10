@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="3_fe"]
+[ext_resource type="Resource" path="res://data/fields/tide_slow.tres" id="4_ts"]
+[ext_resource type="Resource" path="res://data/fields/war_cry.tres" id="5_wc"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/fuxi/fuxi.png" id="6_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "bagua_array"
+display_name = "八卦阵"
+target = 2
+cooldown = 3
+damage_multiplier = 0.7
+fields_to_apply = Array[ExtResource("3_fe")]([ExtResource("4_ts")])
+description = "布下先天八卦阵，攻击全体敌人并施加潮缚减速。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "xiantian_yan"
+display_name = "先天演算"
+target = 0
+cooldown = 3
+fields_to_self = Array[ExtResource("3_fe")]([ExtResource("5_wc")])
+description = "推演先天之数，大幅提升自身攻击力。"
+
+[resource]
+script = ExtResource("1_card")
+id = "fuxi"
+display_name = "伏羲"
+book_id = "journey_to_the_west"
+character_id = "fuxi"
+rarity = 4
+base_hp = 1200
+base_atk = 130
+base_def = 75
+base_spd = 110
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("6_portrait")

@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="3_fe"]
+[ext_resource type="Resource" path="res://data/fields/stun.tres" id="4_stun"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/yuhuangdadi/yuhuangdadi.png" id="5_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "heavenly_might"
+display_name = "天威"
+target = 1
+cooldown = 2
+damage_multiplier = 1.5
+description = "以天帝之威震慑单个敌人，造成高额伤害。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "imperial_edict"
+display_name = "降旨"
+target = 1
+cooldown = 4
+fields_to_apply = Array[ExtResource("3_fe")]([ExtResource("4_stun")])
+description = "降下玉帝旨意，使单个敌人眩晕一回合。"
+
+[resource]
+script = ExtResource("1_card")
+id = "yuhuangdadi"
+display_name = "玉皇大帝"
+book_id = "journey_to_the_west"
+character_id = "yuhuangdadi"
+rarity = 5
+base_hp = 1500
+base_atk = 170
+base_def = 90
+base_spd = 95
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("5_portrait")

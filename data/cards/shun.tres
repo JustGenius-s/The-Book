@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="1_card"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="2_skill"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="3_fe"]
+[ext_resource type="Resource" path="res://data/fields/mountain_qi.tres" id="4_mq"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/shun/shun.png" id="5_portrait"]
+
+[sub_resource type="Resource" id="Resource_skill1"]
+script = ExtResource("2_skill")
+id = "filial_piety"
+display_name = "孝感动天"
+target = 0
+cooldown = 3
+heal_multiplier = 0.4
+fields_to_remove = Array[String](["burn", "stun"])
+description = "孝心感动天地，恢复自身生命并驱散灼烧与眩晕。"
+
+[sub_resource type="Resource" id="Resource_skill2"]
+script = ExtResource("2_skill")
+id = "plow_lishan"
+display_name = "耕历山"
+target = 0
+cooldown = 2
+fields_to_self = Array[ExtResource("3_fe")]([ExtResource("4_mq")])
+description = "躬耕历山磨练意志，获得花果山灵气，小幅提升攻击力。"
+
+[resource]
+script = ExtResource("1_card")
+id = "shun"
+display_name = "舜"
+book_id = "journey_to_the_west"
+character_id = "shun"
+rarity = 3
+base_hp = 1300
+base_atk = 90
+base_def = 95
+base_spd = 85
+skills = Array[ExtResource("2_skill")]([SubResource("Resource_skill1"), SubResource("Resource_skill2")])
+portrait = ExtResource("5_portrait")
