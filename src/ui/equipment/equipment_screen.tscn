@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://collection01"]
+[gd_scene load_steps=4 format=3 uid="uid://equipscreen01"]
 
 [ext_resource type="Theme" uid="uid://do1sna6jhrvx7" path="res://assets/ui/themes/ui.tres" id="1_theme"]
-[ext_resource type="Script" path="res://src/ui/collection/collection_screen.gd" id="2_script"]
+[ext_resource type="Script" path="res://src/ui/equipment/equipment_screen.gd" id="2_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
 bg_color = Color(0.08, 0.08, 0.14, 0.92)
@@ -15,7 +15,7 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.4, 0.4, 0.55, 0.6)
 
-[node name="CollectionScreen" type="Control"]
+[node name="EquipmentScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,7 +53,7 @@ text = "返回主菜单"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "卡牌图鉴"
+text = "装备穿戴"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -62,21 +62,90 @@ layout_mode = 2
 text = ""
 vertical_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="."]
+[node name="ShopBtn" type="Button" parent="TopBar"]
+layout_mode = 2
+text = "去商店"
+
+[node name="HBox" type="HBoxContainer" parent="."]
 layout_mode = 1
-anchor_left = 0.03
-anchor_top = 0.12
-anchor_right = 0.97
-anchor_bottom = 0.97
+anchors_preset = 15
+anchor_left = 0.02
+anchor_top = 0.1
+anchor_right = 0.98
+anchor_bottom = 0.98
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 16
 
-[node name="Grid" type="GridContainer" parent="Scroll"]
+[node name="Left" type="VBoxContainer" parent="HBox"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LeftTitle" type="Label" parent="HBox/Left"]
+layout_mode = 2
+text = "卡牌列表"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="HBox/Left"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 20
-columns = 5
+size_flags_vertical = 3
+
+[node name="CardList" type="VBoxContainer" parent="HBox/Left/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Right" type="ScrollContainer" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBox" type="VBoxContainer" parent="HBox/Right"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="PortraitRow" type="HBoxContainer" parent="HBox/Right/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Portrait" type="TextureRect" parent="HBox/Right/VBox/PortraitRow"]
+custom_minimum_size = Vector2(120, 140)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="HBox/Right/VBox/PortraitRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "请先选择左侧卡牌"
+vertical_alignment = 1
+
+[node name="SlotTitle" type="Label" parent="HBox/Right/VBox"]
+layout_mode = 2
+text = "装备槽位"
+
+[node name="Slots" type="VBoxContainer" parent="HBox/Right/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BagTitle" type="Label" parent="HBox/Right/VBox"]
+layout_mode = 2
+text = "装备背包"
+
+[node name="BagScroll" type="ScrollContainer" parent="HBox/Right/VBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BagGrid" type="GridContainer" parent="HBox/Right/VBox/BagScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 4
 
 [node name="DetailOverlay" type="Control" parent="."]
 visible = false
@@ -121,23 +190,21 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="Portrait" type="TextureRect" parent="DetailOverlay/Center/Panel/HBox"]
-custom_minimum_size = Vector2(260, 300)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
 [node name="Info" type="VBoxContainer" parent="DetailOverlay/Center/Panel/HBox"]
-custom_minimum_size = Vector2(360, 0)
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="NameLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 24
 text = ""
 
-[node name="OwnedLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
+[node name="SlotLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
+layout_mode = 2
+text = ""
+
+[node name="PriceLabel" type="Label" parent="DetailOverlay/Center/Panel/HBox/Info"]
 layout_mode = 2
 text = ""
 
@@ -145,7 +212,7 @@ text = ""
 layout_mode = 2
 text = ""
 
-[node name="SkillsLabel" type="RichTextLabel" parent="DetailOverlay/Center/Panel/HBox/Info"]
+[node name="FieldsLabel" type="RichTextLabel" parent="DetailOverlay/Center/Panel/HBox/Info"]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 3
@@ -158,11 +225,6 @@ fit_content = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = "关闭"
-
-[node name="EquipBtn" type="Button" parent="DetailOverlay/Center/Panel/HBox/Info"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "装备"
 
 [node name="Tooltip" type="PanelContainer" parent="DetailOverlay"]
 visible = false

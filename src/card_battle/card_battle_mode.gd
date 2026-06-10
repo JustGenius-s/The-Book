@@ -230,8 +230,14 @@ func _start_battle() -> void:
 	if terrain == null:
 		terrain = TerrainLibrary.get_random()
 
+	# 读取每个参战卡牌的装备
+	var ally_equips: Array[Array] = []
+	for id: String in _selected_team:
+		var equips := SaveManager.player.get_card_equips(id)
+		ally_equips.append(equips)
+
 	var no_equips: Array[Array] = []
-	_manager.setup_battle(ally_cards, no_equips, enemy_cards, no_equips, terrain)
+	_manager.setup_battle(ally_cards, ally_equips, enemy_cards, no_equips, terrain)
 	_manager.set_auto_mode(_auto_check.button_pressed)
 	# TerrainManager 每场战斗都会重建，需要重新连接
 	_manager.terrain_manager.terrain_changed.connect(_on_terrain_changed)

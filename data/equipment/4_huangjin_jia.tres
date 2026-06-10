@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_qwjgp"]
+[ext_resource type="Script" path="res://src/core/card/equip_trigger.gd" id="2_elgjw"]
+[ext_resource type="Script" path="res://src/core/card/equipment_data.gd" id="3_shgb0"]
+[ext_resource type="Resource" path="res://data/equipment/eq_hp_bonus.tres" id="4_80q4h"]
+
+[resource]
+script = ExtResource("3_shgb0")
+id = "4_huangjin_jia"
+display_name = "黄金甲"
+slot = "armor"
+price = 150
+stat_bonuses = {
+"def": 12,
+"hp": 60
+}
+synergy_character = "wukong_stone"
+synergy_fields = Array[ExtResource("1_qwjgp")]([ExtResource("4_80q4h")])
+description = "黄金铸造的铠甲，坚不可摧。羁绊角色：石猴"

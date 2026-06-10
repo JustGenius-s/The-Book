@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_6vuk3"]
+
+[resource]
+script = ExtResource("1_6vuk3")
+id = "eq_reflect_dot"
+display_name = "反伤"
+type = 1
+duration = 2
+effects = {
+"dot_damage": 15
+}

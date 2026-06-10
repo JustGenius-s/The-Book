@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_jfej7"]
+[ext_resource type="Script" path="res://src/core/card/equip_trigger.gd" id="2_nmgum"]
+[ext_resource type="Resource" path="res://data/equipment/eq_reflect_dot.tres" id="3_leejh"]
+[ext_resource type="Script" path="res://src/core/card/equipment_data.gd" id="4_biphb"]
+
+[sub_resource type="Resource" id="Resource_p2f1l"]
+script = ExtResource("2_nmgum")
+event = 1
+chance = 0.25
+field_to_apply = ExtResource("3_leejh")
+
+[resource]
+script = ExtResource("4_biphb")
+id = "5_suozijia"
+display_name = "锁子甲"
+slot = "armor"
+price = 200
+stat_bonuses = {
+"def": 20
+}
+passive_triggers = Array[ExtResource("2_nmgum")]([SubResource("Resource_p2f1l")])
+description = "连环锁子甲，受击时 25% 概率反弹持续伤害。"

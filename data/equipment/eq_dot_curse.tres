@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_6elrq"]
+
+[resource]
+script = ExtResource("1_6elrq")
+id = "eq_dot_curse"
+display_name = "魔咒"
+type = 1
+effects = {
+"dot_damage": 8
+}

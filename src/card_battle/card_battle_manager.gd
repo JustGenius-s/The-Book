@@ -171,6 +171,7 @@ func _run_battle() -> void:
 				continue
 
 			unit.process_turn_start()
+			_process_equip_triggers(unit, EquipTrigger.TriggerEvent.ON_TURN_START, unit)
 			if not unit.is_alive:
 				if _check_battle_end():
 					return
@@ -220,6 +221,7 @@ func _run_battle() -> void:
 		for unit: BattleUnit in _all_units:
 			if unit.is_alive:
 				unit.process_turn_end()
+				_process_equip_triggers(unit, EquipTrigger.TriggerEvent.ON_TURN_END, unit)
 
 		global_fields.tick()
 		turn_ended.emit(turn_number)

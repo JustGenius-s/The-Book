@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_choda"]
+[ext_resource type="Script" path="res://src/core/card/equip_trigger.gd" id="2_7s14l"]
+[ext_resource type="Script" path="res://src/core/card/equipment_data.gd" id="3_t3ah4"]
+[ext_resource type="Resource" path="res://data/equipment/eq_atk_boost.tres" id="4_0doy3"]
+
+[resource]
+script = ExtResource("3_t3ah4")
+id = "1_ruyi_bang"
+display_name = "如意棒"
+stat_bonuses = {
+"atk": 25
+}
+synergy_character = "wukong_king"
+synergy_fields = Array[ExtResource("1_choda")]([ExtResource("4_0doy3")])
+description = "金箍棒的凡间化身，虽未及原版神威，仍能大幅提升攻击力。羁绊角色：美猴王"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_qd2kn"]
+
+[resource]
+script = ExtResource("1_qd2kn")
+id = "eq_spd_bonus"
+display_name = "凤翅凌云"
+effects = {
+"spd_flat": 15
+}

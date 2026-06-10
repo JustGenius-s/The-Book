@@ -30,3 +30,11 @@ func _on_btn_card_battle_pressed() -> void:
 
 func _on_btn_collection_pressed() -> void:
 	GameManager.enter_collection()
+
+
+func _on_btn_equipment_pressed() -> void:
+	GameManager.enter_equipment()
+
+
+func _on_btn_shop_pressed() -> void:
+	GameManager.enter_shop()

@@ -8,6 +8,7 @@ extends RefCounted
 
 const FIELDS_DIR := "res://data/fields"
 const TERRAINS_DIR := "res://data/terrains"
+const EQUIP_FIELDS_DIR := "res://data/equipment"
 
 const URL_FIELD := "field:"
 const URL_TERRAIN := "terrain:"
@@ -143,6 +144,13 @@ static func skill_bbcode(skill: SkillData) -> String:
 	return text
 
 
+## 渲染单个字段为点击链接 BBCode，如 [url=field:burn][color=#e88a6a]灼烧[/color][/url] 每回合受到 25 点伤害
+static func field_bbcode(field: FieldEntry) -> String:
+	return "[url=%s%s][color=%s]%s[/color][/url] %s" % [
+		URL_FIELD, field.id, _color_of(field), field.display_name, describe(field),
+	]
+
+
 ## 根据点击链接（如 field:burn），返回对应的详情 BBCode；找不到返回空
 static func lookup(url: String) -> String:
 	if url.begins_with(URL_FIELD):
@@ -154,6 +162,8 @@ static func lookup(url: String) -> String:
 
 static func _field_detail(id: String) -> String:
 	var path := "%s/%s.tres" % [FIELDS_DIR, id]
+	if not ResourceLoader.exists(path):
+		path = "%s/%s.tres" % [EQUIP_FIELDS_DIR, id]
 	if not ResourceLoader.exists(path):
 		return ""
 	var field := load(path) as FieldEntry

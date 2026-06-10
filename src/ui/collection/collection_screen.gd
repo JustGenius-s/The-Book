@@ -12,10 +12,14 @@ const UNOWNED_TINT := Color(0.3, 0.3, 0.3)
 @onready var _detail_owned: Label = $DetailOverlay/Center/Panel/HBox/Info/OwnedLabel
 @onready var _detail_stats: Label = $DetailOverlay/Center/Panel/HBox/Info/StatsLabel
 @onready var _detail_skills: RichTextLabel = $DetailOverlay/Center/Panel/HBox/Info/SkillsLabel
+@onready var _detail_equip_btn: Button = $DetailOverlay/Center/Panel/HBox/Info/EquipBtn
 @onready var _detail_tooltip: PanelContainer = $DetailOverlay/Tooltip
 @onready var _detail_tooltip_text: RichTextLabel = $DetailOverlay/Tooltip/HBox/Text
 @onready var _tooltip_bg: ColorRect = $DetailOverlay/TooltipBg
 @onready var _tooltip_close: Button = $DetailOverlay/Tooltip/HBox/CloseBtn
+
+
+var _current_card: String = ""
 
 
 func _ready() -> void:
@@ -29,6 +33,7 @@ func _ready() -> void:
 			_hide_skill_tooltip()
 	)
 	_tooltip_close.pressed.connect(_hide_skill_tooltip)
+	_detail_equip_btn.pressed.connect(_on_btn_enter_equipment)
 
 	_gold_label.text = "金币：%d" % SaveManager.player.get_currency("gold")
 	_populate_grid()
@@ -77,6 +82,7 @@ func _make_tile(card: CardData, owned: bool) -> Button:
 
 
 func _show_detail(card: CardData, owned: bool) -> void:
+	_current_card = card.id
 	_detail_portrait.texture = card.portrait
 	_detail_portrait.modulate = Color.WHITE if owned else UNOWNED_TINT
 	_detail_name.text = "%s %s" % ["★".repeat(card.rarity), card.display_name]
@@ -114,4 +120,8 @@ func _on_detail_meta_clicked(meta: String) -> void:
 	_detail_tooltip_text.clear()
 	_detail_tooltip_text.append_text(info)
 	_show_skill_tooltip()
+
+
+func _on_btn_enter_equipment() -> void:
+	GameManager.enter_equipment_for_card(_current_card)
 

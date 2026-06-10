@@ -121,3 +121,11 @@ func _apply_equipment_innate_fields() -> void:
 			copy.source = FieldEntry.FieldSource.EQUIPMENT
 			copy.duration = -1
 			field_container.add_field(copy)
+
+		# 羁绊：若装备的 synergy_character 与当前卡牌匹配，注入 synergy_fields
+		if equip.synergy_character != "" and equip.synergy_character == card.id:
+			for field: FieldEntry in equip.synergy_fields:
+				var copy := field.duplicate_entry()
+				copy.source = FieldEntry.FieldSource.EQUIPMENT
+				copy.duration = -1
+				field_container.add_field(copy)

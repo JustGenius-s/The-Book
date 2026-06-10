@@ -22,6 +22,7 @@ SceneManager="*res://src/main/scene_manager.gd"
 GameManager="*res://src/main/game_manager.gd"
 CardLibrary="*res://src/core/card/card_library.gd"
 TerrainLibrary="*res://src/core/card/terrain_library.gd"
+EquipmentLibrary="*res://src/core/equipment/equipment_library.gd"
 SaveManager="*res://src/core/save/save_manager.gd"
 
 [display]

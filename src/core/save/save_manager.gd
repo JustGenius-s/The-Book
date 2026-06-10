@@ -4,6 +4,10 @@ const SAVE_PATH := "user://saves/player.json"
 
 ## 新档默认发放的卡牌，同时作为默认编队
 const STARTER_CARDS: Array[String] = ["wukong_king", "wukong_monk", "wukong_stone"]
+## 新档默认发放的装备
+const STARTER_EQUIPS: Array[String] = ["1_ruyi_bang", "5_suozijia"]
+## 新档初始金币（够进商店买件入门装备）
+const STARTER_GOLD := 200
 
 var player: PlayerData = PlayerData.new()
 
@@ -14,11 +18,16 @@ func _ready() -> void:
 
 
 func _ensure_starter_content() -> void:
-	if player.owned_card_ids.is_empty():
+	var is_new := player.owned_card_ids.is_empty()
+	if is_new:
 		for card_id: String in STARTER_CARDS:
 			player.grant_card(card_id)
 	if player.card_battle_team.is_empty():
 		player.card_battle_team.assign(STARTER_CARDS)
+	if is_new and player.owned_equipment_ids.is_empty():
+		for equip_id: String in STARTER_EQUIPS:
+			player.grant_equip(equip_id)
+		player.add_currency("gold", STARTER_GOLD)
 	save_game()
 
 

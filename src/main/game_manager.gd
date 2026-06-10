@@ -35,6 +35,19 @@ func enter_collection() -> void:
 	SceneManager.change_scene("res://src/ui/collection/collection_screen.tscn")
 
 
+func enter_equipment() -> void:
+	SceneManager.change_scene("res://src/ui/equipment/equipment_screen.tscn")
+
+
+func enter_equipment_for_card(card_id: String) -> void:
+	set_meta("equip_preselect_card", card_id)
+	SceneManager.change_scene("res://src/ui/equipment/equipment_screen.tscn")
+
+
+func enter_shop() -> void:
+	SceneManager.change_scene("res://src/ui/shop/shop_screen.tscn")
+
+
 func return_to_main_menu() -> void:
 	current_mode = GameMode.NONE
 	SceneManager.change_scene("res://src/main/main.tscn")

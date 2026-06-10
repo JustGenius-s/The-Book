@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_kpm5a"]
+
+[resource]
+script = ExtResource("1_kpm5a")
+id = "eq_heal_strength"
+display_name = "禅心"
+effects = {
+"heal_per_turn": 15
+}

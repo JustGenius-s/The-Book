@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_sv45w"]
+
+[resource]
+script = ExtResource("1_sv45w")
+id = "eq_hp_bonus"
+display_name = "金甲护体"
+effects = {
+"hp_flat": 80
+}
