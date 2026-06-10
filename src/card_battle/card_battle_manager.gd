@@ -331,9 +331,12 @@ func _execute_action(attacker: BattleUnit, skill: SkillData, targets: Array[Batt
 			target.field_container.remove_field(field_id)
 
 		if result.terrain_to_create != "":
-			var terrain_res := load("res://data/terrains/%s.tres" % result.terrain_to_create)
-			if terrain_res is TerrainData:
-				terrain_manager.set_terrain(terrain_res)
+			var current := terrain_manager.get_current_terrain()
+			# 同场地不重复设置（群体技能会按目标多次结算）
+			if current == null or current.id != result.terrain_to_create:
+				var terrain_res := load("res://data/terrains/%s.tres" % result.terrain_to_create)
+				if terrain_res is TerrainData:
+					terrain_manager.set_terrain(terrain_res)
 
 		_process_equip_triggers(attacker, EquipTrigger.TriggerEvent.ON_ATTACK, target)
 		_process_equip_triggers(target, EquipTrigger.TriggerEvent.ON_HIT, attacker)

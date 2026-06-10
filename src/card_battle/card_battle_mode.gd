@@ -5,6 +5,7 @@ extends Control
 
 const ENCOUNTER_PATH := "res://data/encounters/demo_battle.tres"
 const TEAM_SIZE := 3
+const DEFAULT_BG_COLOR := Color(0.09, 0.08, 0.12)
 const ALLY_FRAME_COLOR := Color(0.35, 0.75, 1.0)
 const ENEMY_FRAME_COLOR := Color(0.95, 0.45, 0.4)
 const CURRENT_FRAME_COLOR := Color(1.0, 0.9, 0.3)
@@ -33,6 +34,8 @@ const CURRENT_FRAME_COLOR := Color(1.0, 0.9, 0.3)
 
 var _encounter: EncounterData
 var _views: Dictionary = {}
+var _bg_front_is_a: bool = true
+var _bg_tween: Tween
 var _selected_team: Array[String] = []
 var _team_tiles: Dictionary = {}
 var _slot_buttons: Array[Button] = []
@@ -211,9 +214,16 @@ func _start_battle() -> void:
 	var enemy_cards: Array[CardData] = []
 	enemy_cards.assign(_encounter.enemy_cards)
 
+	# 遭遇战指定了场地则用之，否则随机；保证每场战斗都有场地
+	var terrain: TerrainData = _encounter.terrain
+	if terrain == null:
+		terrain = TerrainLibrary.get_random()
+
 	var no_equips: Array[Array] = []
-	_manager.setup_battle(ally_cards, no_equips, enemy_cards, no_equips, _encounter.terrain)
+	_manager.setup_battle(ally_cards, no_equips, enemy_cards, no_equips, terrain)
 	_manager.set_auto_mode(_auto_check.button_pressed)
+	# TerrainManager 每场战斗都会重建，需要重新连接
+	_manager.terrain_manager.terrain_changed.connect(_on_terrain_changed)
 
 	# 站位顺序：1 号位在最上方（单体攻击默认命中存活的最前位）
 	for unit: BattleUnit in _manager.get_ally_units():
@@ -221,14 +231,72 @@ func _start_battle() -> void:
 	for unit: BattleUnit in _manager.get_enemy_units():
 		_add_view(unit, _enemy_column, true)
 
-	var terrain := _manager.terrain_manager.get_current_terrain()
-	_terrain_label.text = "地形：%s" % terrain.display_name if terrain else ""
+	_update_terrain_display()
 	_turn_label.text = "回合 0"
 	_log.clear()
 	_append_log("%s —— 战斗开始！" % _encounter.display_name)
+	if terrain:
+		_append_log("本场战场：%s —— %s" % [terrain.display_name, terrain.description])
 	_refresh_order_bar()
 
 	_manager.start_battle()
+
+
+# ---------- 场地 ----------
+
+func _on_terrain_changed(_old_id: String, _new_id: String) -> void:
+	_update_terrain_display()
+	var terrain := _manager.terrain_manager.get_current_terrain()
+	if terrain:
+		_append_log("场地化为「%s」—— %s" % [terrain.display_name, terrain.description])
+	else:
+		_append_log("场地恢复如常")
+
+
+func _update_terrain_display() -> void:
+	var terrain := _manager.terrain_manager.get_current_terrain()
+
+	if terrain:
+		_terrain_label.text = "场地：%s" % terrain.display_name
+		var tooltip_lines: PackedStringArray = [terrain.description]
+		for field: FieldEntry in terrain.global_fields:
+			tooltip_lines.append("「%s」%s" % [field.display_name, FieldText.describe(field)])
+		_terrain_label.tooltip_text = "\n".join(tooltip_lines)
+	else:
+		_terrain_label.text = ""
+		_terrain_label.tooltip_text = ""
+
+	_transition_terrain_bg(terrain)
+
+
+func _transition_terrain_bg(terrain: TerrainData) -> void:
+	# TODO: terrain.bg_scene_path 非空时实例化动画场景替代静态图（后期动画效果）
+	var bg_color := terrain.bg_color if terrain else DEFAULT_BG_COLOR
+	var new_texture: Texture2D = terrain.bg_texture if terrain else null
+
+	var front: TextureRect = $BgA if _bg_front_is_a else $BgB
+	var back: TextureRect = $BgB if _bg_front_is_a else $BgA
+
+	if _bg_tween and _bg_tween.is_valid():
+		_bg_tween.kill()
+
+	_bg_tween = create_tween()
+	_bg_tween.set_parallel(true)
+	_bg_tween.tween_property($Background, "color", bg_color, 0.8)
+	_bg_tween.tween_property(
+		$BgDim, "color",
+		Color(bg_color.r, bg_color.g, bg_color.b, 0.45),
+		0.8,
+	)
+
+	if front.texture == new_texture:
+		return
+
+	back.texture = new_texture
+	back.modulate.a = 0.0
+	_bg_tween.tween_property(back, "modulate:a", 1.0 if new_texture else 0.0, 0.8)
+	_bg_tween.tween_property(front, "modulate:a", 0.0, 0.8)
+	_bg_front_is_a = not _bg_front_is_a
 
 
 func _add_view(unit: BattleUnit, column: VBoxContainer, mirrored: bool) -> void:

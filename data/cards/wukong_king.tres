@@ -23,7 +23,8 @@ fields_to_apply = Array[ExtResource("4_481v0")]([ExtResource("5_y1wwo")])
 condition = 1
 condition_field_id = "burn"
 conditional_bonus_multiplier = 0.3
-description = "攻击所有敌人并施加灼烧；对已灼烧的目标伤害提升 30%。"
+terrain_to_create = "flame_domain"
+description = "攻击所有敌人并施加灼烧，将场地化为焰天火场；对已灼烧的目标伤害提升 30%。"
 
 [resource]
 script = ExtResource("2_0vnpy")

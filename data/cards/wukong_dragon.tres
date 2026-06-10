@@ -11,7 +11,10 @@ script = ExtResource("3_oib2b")
 id = "water_arrow"
 display_name = "水箭"
 damage_multiplier = 0.85
-description = "射出水箭攻击单个敌人。"
+condition = 3
+condition_field_id = "water_qi"
+conditional_bonus_multiplier = 0.4
+description = "射出水箭攻击单个敌人；处于龙宫水域时伤害提升 40%。"
 
 [sub_resource type="Resource" id="Resource_okb83"]
 script = ExtResource("3_oib2b")
@@ -21,7 +24,8 @@ target = 5
 cooldown = 3
 damage_multiplier = 1.2
 fields_to_apply = Array[ExtResource("4_hwqbb")]([ExtResource("5_60n2d")])
-description = "随机重击一名敌人并使其速度降低 30%。"
+terrain_to_create = "water_domain"
+description = "随机重击一名敌人并使其速度降低 30%，同时将场地化为龙宫水域。"
 
 [resource]
 script = ExtResource("2_tvber")

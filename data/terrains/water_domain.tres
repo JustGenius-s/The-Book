@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TerrainData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_fe"]
+[ext_resource type="Resource" path="res://data/fields/water_qi.tres" id="2_wq"]
+[ext_resource type="Script" path="res://src/card_battle/terrain.gd" id="3_td"]
+[ext_resource type="Texture2D" path="res://assets/battle/terrains/terrain_water_domain.png" id="4_bg"]
+
+[resource]
+script = ExtResource("3_td")
+id = "water_domain"
+display_name = "龙宫水域"
+description = "水汽氤氲，所有单位每回合恢复 12 点生命。"
+global_fields = Array[ExtResource("1_fe")]([ExtResource("2_wq")])
+bg_texture = ExtResource("4_bg")
+bg_color = Color(0.05, 0.08, 0.14, 1)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TerrainData" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_fe"]
+[ext_resource type="Resource" path="res://data/fields/flame_qi.tres" id="2_fq"]
+[ext_resource type="Script" path="res://src/card_battle/terrain.gd" id="3_td"]
+[ext_resource type="Texture2D" path="res://assets/battle/terrains/terrain_flame_domain.png" id="4_bg"]
+
+[resource]
+script = ExtResource("3_td")
+id = "flame_domain"
+display_name = "焰天火场"
+description = "烈焰焚天，所有单位每回合受到 12 点伤害。"
+global_fields = Array[ExtResource("1_fe")]([ExtResource("2_fq")])
+bg_texture = ExtResource("4_bg")
+bg_color = Color(0.13, 0.06, 0.05, 1)

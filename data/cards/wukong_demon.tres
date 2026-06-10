@@ -10,7 +10,10 @@
 script = ExtResource("3_melkk")
 id = "demon_claw"
 display_name = "魔爪"
-description = "用魔爪撕裂单个敌人。"
+condition = 3
+condition_field_id = "flame_qi"
+conditional_bonus_multiplier = 0.3
+description = "用魔爪撕裂单个敌人；处于焰天火场时伤害提升 30%。"
 
 [sub_resource type="Resource" id="Resource_gtppe"]
 script = ExtResource("3_melkk")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_fq"]
+
+[resource]
+script = ExtResource("1_fq")
+id = "flame_qi"
+display_name = "炽炎之气"
+type = 1
+duration = -1
+effects = {
+"dot_damage": 12
+}

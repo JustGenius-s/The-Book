@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_omyuu"]
 [ext_resource type="Resource" path="res://data/fields/mountain_qi.tres" id="2_bevhh"]
 [ext_resource type="Script" path="res://src/card_battle/terrain.gd" id="3_g6dmd"]
+[ext_resource type="Texture2D" path="res://assets/battle/terrains/terrain_huaguo_mountain.png" id="4_bg"]
 
 [resource]
 script = ExtResource("3_g6dmd")
@@ -10,3 +11,5 @@ id = "huaguo_mountain"
 display_name = "花果山"
 description = "灵气充沛，所有单位攻击力提升 5%。"
 global_fields = Array[ExtResource("1_omyuu")]([ExtResource("2_bevhh")])
+bg_texture = ExtResource("4_bg")
+bg_color = Color(0.06, 0.1, 0.07, 1)
