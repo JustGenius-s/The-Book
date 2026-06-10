@@ -27,6 +27,7 @@ var state: BattleState = BattleState.IDLE
 var turn_number: int = 0
 var global_fields: FieldContainer = FieldContainer.new()
 var terrain_manager: TerrainManager
+var trait_processor: TraitProcessor
 ## 自动模式下我方单位由 AI 行动；敌方始终 AI
 var auto_mode: bool = false
 
@@ -86,8 +87,14 @@ func setup_battle(
 		_all_units.append(unit)
 		add_child(unit)
 
+	trait_processor = TraitProcessor.new(_ally_units, _enemy_units, global_fields, terrain_manager)
+	terrain_manager.terrain_changed.connect(
+		func(_old_id: String, _new_id: String) -> void: trait_processor.evaluate_all()
+	)
+
 	if initial_terrain:
 		terrain_manager.set_terrain(initial_terrain)
+	trait_processor.evaluate_all()
 
 
 func get_ally_units() -> Array[BattleUnit]:
@@ -172,6 +179,7 @@ func _run_battle() -> void:
 
 			unit.process_turn_start()
 			_process_equip_triggers(unit, EquipTrigger.TriggerEvent.ON_TURN_START, unit)
+			trait_processor.process_event(TraitData.TriggerEvent.ON_TURN_START, unit)
 			if not unit.is_alive:
 				if _check_battle_end():
 					return
@@ -222,8 +230,11 @@ func _run_battle() -> void:
 			if unit.is_alive:
 				unit.process_turn_end()
 				_process_equip_triggers(unit, EquipTrigger.TriggerEvent.ON_TURN_END, unit)
+				trait_processor.process_event(TraitData.TriggerEvent.ON_TURN_END, unit)
 
 		global_fields.tick()
+		# 字段到期可能改变特性条件（如 SELF_HAS_FIELD），回合末重评估
+		trait_processor.evaluate_all()
 		turn_ended.emit(turn_number)
 
 		if turn_number >= 100:
@@ -342,11 +353,17 @@ func _execute_action(attacker: BattleUnit, skill: SkillData, targets: Array[Batt
 
 		_process_equip_triggers(attacker, EquipTrigger.TriggerEvent.ON_ATTACK, target)
 		_process_equip_triggers(target, EquipTrigger.TriggerEvent.ON_HIT, attacker)
+		trait_processor.process_event(TraitData.TriggerEvent.ON_ATTACK, attacker)
+		trait_processor.process_event(TraitData.TriggerEvent.ON_HIT, target)
 
 		if not target.is_alive:
 			_process_equip_triggers(attacker, EquipTrigger.TriggerEvent.ON_KILL, target)
+			trait_processor.process_event(TraitData.TriggerEvent.ON_KILL, attacker)
 
 		unit_action.emit(attacker, skill, target, result)
+
+	# 行动可能导致死亡/驱散/场地外字段变化，重评估状态型特性
+	trait_processor.evaluate_all()
 
 
 func _process_equip_triggers(unit: BattleUnit, event: EquipTrigger.TriggerEvent, other: BattleUnit) -> void:

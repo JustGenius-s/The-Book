@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_sle"]
+
+[resource]
+script = ExtResource("1_sle")
+id = "shuilian_echo"
+display_name = "水帘呼应"
+type = 0
+duration = -1
+effects = {
+"spd_percent": 0.2,
+"damage_bonus_percent": 0.15
+}

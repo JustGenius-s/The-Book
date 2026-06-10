@@ -2,7 +2,7 @@ class_name FieldEntry
 extends Resource
 
 enum FieldType { BUFF, DEBUFF, SPECIAL }
-enum FieldSource { SKILL, TERRAIN, EQUIPMENT }
+enum FieldSource { SKILL, TERRAIN, EQUIPMENT, TRAIT }
 
 @export var id: String
 @export var display_name: String

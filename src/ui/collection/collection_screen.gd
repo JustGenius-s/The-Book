@@ -99,6 +99,9 @@ func _show_detail(card: CardData, owned: bool) -> void:
 	for skill: SkillData in card.skills:
 		_detail_skills.append_text("%s\n\n" % FieldText.skill_bbcode(skill))
 
+	for trait_data: TraitData in card.traits:
+		_detail_skills.append_text("%s\n\n" % FieldText.trait_bbcode(trait_data))
+
 	_detail_overlay.visible = true
 	_hide_skill_tooltip()
 

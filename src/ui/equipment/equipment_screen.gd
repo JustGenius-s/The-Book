@@ -248,6 +248,11 @@ func _show_equip_detail(equip: EquipmentData) -> void:
 			for f in equip.synergy_fields:
 				_detail_fields.append_text("  · %s\n" % FieldText.field_bbcode(f))
 
+	if not equip.traits.is_empty():
+		_detail_fields.append_text("\n[color=#aaa]装备特性：[/color]\n")
+		for trait_data: TraitData in equip.traits:
+			_detail_fields.append_text("%s\n" % FieldText.trait_bbcode(trait_data))
+
 	if equip.description:
 		_detail_fields.append_text("\n[i]%s[/i]" % equip.description)
 

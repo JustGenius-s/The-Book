@@ -239,8 +239,10 @@ func _start_battle() -> void:
 	var no_equips: Array[Array] = []
 	_manager.setup_battle(ally_cards, ally_equips, enemy_cards, no_equips, terrain)
 	_manager.set_auto_mode(_auto_check.button_pressed)
-	# TerrainManager 每场战斗都会重建，需要重新连接
+	# TerrainManager / TraitProcessor 每场战斗都会重建，需要重新连接
 	_manager.terrain_manager.terrain_changed.connect(_on_terrain_changed)
+	_manager.trait_processor.trait_activated.connect(_on_trait_activated)
+	_manager.trait_processor.trait_deactivated.connect(_on_trait_deactivated)
 
 	# 站位顺序：1 号位在最上方（单体攻击默认命中存活的最前位）
 	for unit: BattleUnit in _manager.get_ally_units():
@@ -254,6 +256,9 @@ func _start_battle() -> void:
 	_append_log("%s —— 战斗开始！" % _encounter.display_name)
 	if terrain:
 		_append_log("本场战场：%s —— %s" % [terrain.display_name, terrain.description])
+	# 开场即激活的特性发生在信号连接之前，这里补记日志
+	for entry: Dictionary in _manager.trait_processor.get_active():
+		_on_trait_activated(entry["unit"], entry["trait"])
 	_refresh_order_bar()
 
 	_manager.start_battle()
@@ -557,6 +562,18 @@ func _on_unit_action(
 
 func _on_unit_stunned(unit: BattleUnit) -> void:
 	_append_log("%s 处于眩晕状态，无法行动" % unit.card.display_name)
+
+
+func _on_trait_activated(unit: BattleUnit, trait_data: TraitData) -> void:
+	_append_log("[color=%s]%s 触发特性【%s】[/color]" % [
+		FieldText.TRAIT_COLOR, unit.card.display_name, trait_data.display_name,
+	])
+
+
+func _on_trait_deactivated(unit: BattleUnit, trait_data: TraitData) -> void:
+	_append_log("[color=%s]%s 的特性【%s】失效[/color]" % [
+		FieldText.TRAIT_COLOR, unit.card.display_name, trait_data.display_name,
+	])
 
 
 func _on_battle_ended(winner: String) -> void:

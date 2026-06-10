@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FieldEntry" format=3]
+
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="1_rss"]
+
+[resource]
+script = ExtResource("1_rss")
+id = "ruoshui_suppress"
+display_name = "弱水压制"
+type = 1
+duration = -1
+effects = {
+"atk_percent": -0.3,
+"dot_damage": 15
+}

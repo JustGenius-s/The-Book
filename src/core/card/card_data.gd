@@ -16,6 +16,9 @@ extends Resource
 @export_group("Skills")
 @export var skills: Array[SkillData] = []
 
+@export_group("Traits")
+@export var traits: Array[TraitData] = []
+
 @export_group("Equipment Slots")
 @export var equipment_slots: Array[String] = ["weapon", "armor", "accessory"]
 
