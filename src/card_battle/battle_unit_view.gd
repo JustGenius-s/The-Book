@@ -1,8 +1,8 @@
 class_name BattleUnitView
 extends Control
 
-## 战斗单位的 UI 视图：头像、血条、状态栏、飘字与简单受击/攻击动画。
-## 支持点击（目标选择）与描边高亮。
+## 战斗单位的紧凑横版视图：头像 + 名字/血条/状态，适配左右布阵。
+## 支持点击（目标选择）、描边高亮与镜像布局（敌方头像在右）。
 
 signal clicked(unit: BattleUnit)
 
@@ -20,62 +20,75 @@ var _fields_label: Label
 var _outline: Panel
 
 
-func setup(p_unit: BattleUnit) -> void:
+func setup(p_unit: BattleUnit, mirrored: bool = false) -> void:
 	unit = p_unit
-	custom_minimum_size = Vector2(150, 252)
+	custom_minimum_size = Vector2(260, 104)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 	_outline = Panel.new()
 	_outline.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 1, 1, 0.06)
+	style.bg_color = Color(1, 1, 1, 0.05)
 	style.set_border_width_all(3)
-	style.set_corner_radius_all(6)
+	style.set_corner_radius_all(8)
 	_outline.add_theme_stylebox_override("panel", style)
 	_outline.visible = false
 	add_child(_outline)
 
-	var vbox := VBoxContainer.new()
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	vbox.add_theme_constant_override("separation", 4)
-	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(vbox)
+	var hbox := HBoxContainer.new()
+	hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hbox.offset_left = 8.0
+	hbox.offset_top = 6.0
+	hbox.offset_right = -8.0
+	hbox.offset_bottom = -6.0
+	hbox.add_theme_constant_override("separation", 10)
+	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hbox)
 
 	_portrait = TextureRect.new()
 	_portrait.texture = unit.card.portrait
-	_portrait.custom_minimum_size = Vector2(140, 150)
+	_portrait.custom_minimum_size = Vector2(88, 88)
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.add_child(_portrait)
+
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_theme_constant_override("separation", 2)
+	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	if mirrored:
+		hbox.add_child(info)
+		hbox.add_child(_portrait)
+	else:
+		hbox.add_child(_portrait)
+		hbox.add_child(info)
 
 	_name_label = Label.new()
 	_name_label.text = unit.card.display_name
-	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(_name_label)
+	_name_label.add_theme_font_size_override("font_size", 14)
+	info.add_child(_name_label)
 
 	_hp_bar = ProgressBar.new()
-	_hp_bar.custom_minimum_size = Vector2(0, 12)
+	_hp_bar.custom_minimum_size = Vector2(0, 10)
 	_hp_bar.max_value = unit.max_hp
 	_hp_bar.value = unit.current_hp
 	_hp_bar.show_percentage = false
-	vbox.add_child(_hp_bar)
+	info.add_child(_hp_bar)
 
 	_hp_label = Label.new()
-	_hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hp_label.add_theme_font_size_override("font_size", 13)
-	vbox.add_child(_hp_label)
+	_hp_label.add_theme_font_size_override("font_size", 11)
+	info.add_child(_hp_label)
 
 	_fields_label = Label.new()
-	_fields_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_fields_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_fields_label.custom_minimum_size = Vector2(0, 36)
-	_fields_label.add_theme_font_size_override("font_size", 12)
+	_fields_label.custom_minimum_size = Vector2(0, 16)
+	_fields_label.add_theme_font_size_override("font_size", 11)
 	_fields_label.add_theme_color_override("font_color", Color(0.85, 0.8, 0.6))
 	# PASS：既能弹出 tooltip，又不挡住选目标的点击
 	_fields_label.mouse_filter = Control.MOUSE_FILTER_PASS
-	vbox.add_child(_fields_label)
+	info.add_child(_fields_label)
 
 	unit.hp_changed.connect(_on_hp_changed)
 	unit.died.connect(_on_died)
@@ -113,7 +126,7 @@ func play_attack() -> void:
 		return
 	pivot_offset = size / 2.0
 	var tween := create_tween()
-	tween.tween_property(self, "scale", Vector2(1.12, 1.12), 0.12)
+	tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.12)
 	tween.tween_property(self, "scale", Vector2.ONE, 0.15)
 
 
@@ -133,6 +146,7 @@ func _on_hp_changed(_unit: BattleUnit, old_hp: int, new_hp: int) -> void:
 func _on_died(_unit: BattleUnit) -> void:
 	modulate = DEAD_TINT
 	_fields_label.text = ""
+	_fields_label.tooltip_text = ""
 	clear_outline()
 
 
@@ -157,17 +171,17 @@ func _refresh_fields() -> void:
 func _spawn_popup(diff: int) -> void:
 	var label := Label.new()
 	label.text = ("+%d" % diff) if diff > 0 else str(diff)
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", 20)
 	label.add_theme_color_override(
 		"font_color",
 		Color(0.45, 1.0, 0.45) if diff > 0 else Color(1.0, 0.35, 0.3),
 	)
 	label.z_index = 10
 	add_child(label)
-	label.position = Vector2(size.x / 2.0 - 18.0, 48.0)
+	label.position = Vector2(size.x / 2.0 - 16.0, 26.0)
 
 	var tween := create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(label, "position:y", label.position.y - 46.0, 0.8)
+	tween.tween_property(label, "position:y", label.position.y - 40.0, 0.8)
 	tween.tween_property(label, "modulate:a", 0.0, 0.6).set_delay(0.25)
 	tween.chain().tween_callback(label.queue_free)

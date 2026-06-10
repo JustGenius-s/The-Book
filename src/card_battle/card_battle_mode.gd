@@ -1,22 +1,31 @@
 extends Control
 
-## 卡牌对战模式：编队 → 对战（手动/自动）→ 结算奖励。
+## 卡牌对战模式：编队（带站位）→ 对战（手动/自动）→ 结算奖励。
+## 战斗布局：我方左列、敌方右列；右侧垂直行动条；右下技能图标栏；日志折叠抽屉。
 
 const ENCOUNTER_PATH := "res://data/encounters/demo_battle.tres"
 const TEAM_SIZE := 3
+const ALLY_FRAME_COLOR := Color(0.35, 0.75, 1.0)
+const ENEMY_FRAME_COLOR := Color(0.95, 0.45, 0.4)
+const CURRENT_FRAME_COLOR := Color(1.0, 0.9, 0.3)
 
 @onready var _manager: CardBattleManager = $BattleManager
 @onready var _turn_label: Label = $TopBar/TurnLabel
 @onready var _terrain_label: Label = $TopBar/TerrainLabel
 @onready var _auto_check: CheckButton = $TopBar/AutoCheck
-@onready var _enemy_row: HBoxContainer = $EnemyRow
-@onready var _ally_row: HBoxContainer = $AllyRow
-@onready var _action_panel: HBoxContainer = $ActionPanel
-@onready var _hint_label: Label = $ActionPanel/HintLabel
-@onready var _skill_buttons: HBoxContainer = $ActionPanel/SkillButtons
-@onready var _log: RichTextLabel = $LogPanel/Log
+@onready var _log_button: Button = $TopBar/LogButton
+@onready var _ally_column: VBoxContainer = $AllyColumn
+@onready var _enemy_column: VBoxContainer = $EnemyColumn
+@onready var _order_bar: VBoxContainer = $OrderBar
+@onready var _detail_panel: PanelContainer = $BottomRight/DetailPanel
+@onready var _detail_text: RichTextLabel = $BottomRight/DetailPanel/DetailText
+@onready var _hint_label: Label = $BottomRight/HintLabel
+@onready var _skill_icons: HBoxContainer = $BottomRight/SkillIcons
+@onready var _log_drawer: PanelContainer = $LogDrawer
+@onready var _log: RichTextLabel = $LogDrawer/Log
 @onready var _team_overlay: Control = $TeamSelectOverlay
 @onready var _card_grid: HBoxContainer = $TeamSelectOverlay/Center/Panel/VBox/CardGrid
+@onready var _slot_row: HBoxContainer = $TeamSelectOverlay/Center/Panel/VBox/SlotRow
 @onready var _confirm_button: Button = $TeamSelectOverlay/Center/Panel/VBox/Buttons/ConfirmButton
 @onready var _result_overlay: Control = $ResultOverlay
 @onready var _result_label: Label = $ResultOverlay/Center/Panel/VBox/ResultLabel
@@ -25,8 +34,11 @@ const TEAM_SIZE := 3
 var _encounter: EncounterData
 var _views: Dictionary = {}
 var _selected_team: Array[String] = []
+var _team_tiles: Dictionary = {}
+var _slot_buttons: Array[Button] = []
 var _acting_unit: BattleUnit
-var _chosen_skill: SkillData
+var _selected_skill: SkillData
+var _skill_buttons: Dictionary = {}
 
 
 func _ready() -> void:
@@ -38,22 +50,24 @@ func _ready() -> void:
 	$ResultOverlay/Center/Panel/VBox/Buttons/RestartButton.pressed.connect(_show_team_select)
 	_confirm_button.pressed.connect(_on_team_confirmed)
 	_auto_check.toggled.connect(func(on: bool) -> void: _manager.set_auto_mode(on))
+	_log_button.toggled.connect(func(on: bool) -> void: _log_drawer.visible = on)
 
 	_manager.turn_started.connect(_on_turn_started)
 	_manager.unit_acting.connect(_on_unit_acting)
 	_manager.unit_action.connect(_on_unit_action)
 	_manager.unit_stunned.connect(_on_unit_stunned)
 	_manager.action_requested.connect(_on_action_requested)
+	_manager.action_order_changed.connect(_refresh_order_bar)
 	_manager.battle_ended.connect(_on_battle_ended)
 
 	_show_team_select()
 
 
-# ---------- 编队 ----------
+# ---------- 编队与站位 ----------
 
 func _show_team_select() -> void:
 	_result_overlay.visible = false
-	_action_panel.visible = false
+	_end_input_phase()
 	_team_overlay.visible = true
 
 	_selected_team.clear()
@@ -61,22 +75,34 @@ func _show_team_select() -> void:
 		if SaveManager.player.has_card(id) and CardLibrary.has_card(id):
 			_selected_team.append(id)
 
+	_team_tiles.clear()
 	for child in _card_grid.get_children():
 		child.queue_free()
-
 	for card_id: String in SaveManager.player.owned_card_ids:
 		var card: CardData = CardLibrary.get_card(card_id)
 		if card == null:
 			continue
-		_card_grid.add_child(_make_team_tile(card))
+		var tile := _make_team_tile(card)
+		_card_grid.add_child(tile)
+		_team_tiles[card.id] = tile
 
-	_update_team_select_state()
+	_slot_buttons.clear()
+	for child in _slot_row.get_children():
+		child.queue_free()
+	for i in TEAM_SIZE:
+		var slot := Button.new()
+		slot.custom_minimum_size = Vector2(150, 190)
+		slot.pressed.connect(_on_slot_pressed.bind(i))
+		_slot_row.add_child(slot)
+		_slot_buttons.append(slot)
+
+	_refresh_slots()
 
 
 func _make_team_tile(card: CardData) -> Button:
 	var tile := Button.new()
 	tile.toggle_mode = true
-	tile.custom_minimum_size = Vector2(150, 210)
+	tile.custom_minimum_size = Vector2(130, 170)
 	tile.button_pressed = _selected_team.has(card.id)
 
 	var vbox := VBoxContainer.new()
@@ -87,7 +113,7 @@ func _make_team_tile(card: CardData) -> Button:
 
 	var portrait := TextureRect.new()
 	portrait.texture = card.portrait
-	portrait.custom_minimum_size = Vector2(140, 140)
+	portrait.custom_minimum_size = Vector2(120, 110)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -96,6 +122,7 @@ func _make_team_tile(card: CardData) -> Button:
 	var name_label := Label.new()
 	name_label.text = "%s %s" % ["★".repeat(card.rarity), card.display_name]
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 13)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(name_label)
 
@@ -108,12 +135,54 @@ func _make_team_tile(card: CardData) -> Button:
 				_selected_team.append(card.id)
 		else:
 			_selected_team.erase(card.id)
-		_update_team_select_state()
+		_refresh_slots()
 	)
 	return tile
 
 
-func _update_team_select_state() -> void:
+func _on_slot_pressed(index: int) -> void:
+	if index >= _selected_team.size():
+		return
+	var removed := _selected_team[index]
+	_selected_team.remove_at(index)
+	var tile: Button = _team_tiles.get(removed)
+	if tile:
+		tile.set_pressed_no_signal(false)
+	_refresh_slots()
+
+
+func _refresh_slots() -> void:
+	for i in TEAM_SIZE:
+		var slot := _slot_buttons[i]
+		for child in slot.get_children():
+			child.queue_free()
+
+		if i < _selected_team.size():
+			var card: CardData = CardLibrary.get_card(_selected_team[i])
+			var vbox := VBoxContainer.new()
+			vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+			vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			vbox.add_theme_constant_override("separation", 4)
+			slot.add_child(vbox)
+
+			var portrait := TextureRect.new()
+			portrait.texture = card.portrait
+			portrait.custom_minimum_size = Vector2(140, 124)
+			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			vbox.add_child(portrait)
+
+			var label := Label.new()
+			label.text = "%d 号位  %s" % [i + 1, card.display_name]
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			label.add_theme_font_size_override("font_size", 13)
+			label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			vbox.add_child(label)
+			slot.text = ""
+		else:
+			slot.text = "%d 号位\n（空）" % [i + 1]
+
 	_confirm_button.disabled = _selected_team.is_empty()
 	_confirm_button.text = "出战（%d/%d）" % [_selected_team.size(), TEAM_SIZE]
 
@@ -130,9 +199,9 @@ func _on_team_confirmed() -> void:
 func _start_battle() -> void:
 	_result_overlay.visible = false
 	_views.clear()
-	for child in _ally_row.get_children():
+	for child in _ally_column.get_children():
 		child.queue_free()
-	for child in _enemy_row.get_children():
+	for child in _enemy_column.get_children():
 		child.queue_free()
 
 	var ally_cards: Array[CardData] = []
@@ -146,80 +215,174 @@ func _start_battle() -> void:
 	_manager.setup_battle(ally_cards, no_equips, enemy_cards, no_equips, _encounter.terrain)
 	_manager.set_auto_mode(_auto_check.button_pressed)
 
-	for unit: BattleUnit in _manager.get_enemy_units():
-		_add_view(unit, _enemy_row)
+	# 站位顺序：1 号位在最上方（单体攻击默认命中存活的最前位）
 	for unit: BattleUnit in _manager.get_ally_units():
-		_add_view(unit, _ally_row)
+		_add_view(unit, _ally_column, false)
+	for unit: BattleUnit in _manager.get_enemy_units():
+		_add_view(unit, _enemy_column, true)
 
 	var terrain := _manager.terrain_manager.get_current_terrain()
 	_terrain_label.text = "地形：%s" % terrain.display_name if terrain else ""
 	_turn_label.text = "回合 0"
 	_log.clear()
 	_append_log("%s —— 战斗开始！" % _encounter.display_name)
+	_refresh_order_bar()
 
 	_manager.start_battle()
 
 
-func _add_view(unit: BattleUnit, row: HBoxContainer) -> void:
+func _add_view(unit: BattleUnit, column: VBoxContainer, mirrored: bool) -> void:
 	var view := BattleUnitView.new()
-	view.setup(unit)
+	view.setup(unit, mirrored)
 	view.clicked.connect(_on_unit_view_clicked)
-	row.add_child(view)
+	column.add_child(view)
 	_views[unit] = view
 
 
-# ---------- 手动操作 ----------
+# ---------- 行动条 ----------
+
+func _refresh_order_bar() -> void:
+	for child in _order_bar.get_children():
+		child.queue_free()
+
+	var order := _manager.get_action_order()
+	var index := _manager.get_action_index()
+
+	for i in order.size():
+		var unit := order[i]
+		if not unit.is_alive:
+			continue
+
+		var is_current := i == index
+		var frame := Panel.new()
+		var frame_size := 52 if is_current else 42
+		frame.custom_minimum_size = Vector2(frame_size, frame_size)
+
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(0, 0, 0, 0.4)
+		style.set_corner_radius_all(6)
+		style.set_border_width_all(3 if is_current else 2)
+		if is_current:
+			style.border_color = CURRENT_FRAME_COLOR
+		else:
+			style.border_color = ALLY_FRAME_COLOR if _manager.is_ally(unit) else ENEMY_FRAME_COLOR
+		frame.add_theme_stylebox_override("panel", style)
+
+		var portrait := TextureRect.new()
+		portrait.texture = unit.card.portrait
+		portrait.set_anchors_preset(Control.PRESET_FULL_RECT)
+		portrait.offset_left = 3.0
+		portrait.offset_top = 3.0
+		portrait.offset_right = -3.0
+		portrait.offset_bottom = -3.0
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		frame.add_child(portrait)
+
+		if i < index:
+			frame.modulate = Color(1, 1, 1, 0.35)
+
+		frame.tooltip_text = unit.card.display_name
+		_order_bar.add_child(frame)
+
+
+# ---------- 手动操作：点选技能 → 再点释放 ----------
 
 func _on_action_requested(unit: BattleUnit) -> void:
 	_acting_unit = unit
-	_chosen_skill = null
+	_selected_skill = null
 
 	var view: BattleUnitView = _views.get(unit)
 	if view:
 		view.set_outline(BattleUnitView.ACTING_COLOR)
 
-	for child in _skill_buttons.get_children():
+	_skill_buttons.clear()
+	for child in _skill_icons.get_children():
 		child.queue_free()
 
 	for skill: SkillData in unit.card.skills:
-		var btn := Button.new()
-		var ready_to_use := unit.can_use_skill(skill)
-		btn.text = skill.display_name if ready_to_use \
-			else "%s（冷却 %d）" % [skill.display_name, unit.current_cooldowns.get(skill.id, 0)]
-		btn.disabled = not ready_to_use
-		btn.tooltip_text = FieldText.plain_tooltip(skill)
-		btn.pressed.connect(_on_skill_chosen.bind(skill))
-		_skill_buttons.add_child(btn)
+		var btn := _make_skill_button(unit, skill)
+		_skill_icons.add_child(btn)
+		_skill_buttons[skill] = btn
 
-	_hint_label.text = "轮到 %s 行动：" % unit.card.display_name
-	_action_panel.visible = true
+	_hint_label.text = "轮到 %s：点击技能查看并选中，再次点击释放" % unit.card.display_name
+	_skill_icons.visible = true
+	_hint_label.visible = true
 
 
-func _on_skill_chosen(skill: SkillData) -> void:
+func _make_skill_button(unit: BattleUnit, skill: SkillData) -> Button:
+	var btn := Button.new()
+	btn.toggle_mode = true
+	btn.custom_minimum_size = Vector2(72, 72)
+
+	if skill.icon:
+		btn.icon = skill.icon
+		btn.expand_icon = true
+		btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	else:
+		# 没有图标素材时用技能名首字作为占位图标
+		btn.text = skill.display_name.substr(0, 1)
+		btn.add_theme_font_size_override("font_size", 30)
+
+	var ready_to_use := unit.can_use_skill(skill)
+	btn.disabled = not ready_to_use
+	if not ready_to_use:
+		var cd := Label.new()
+		cd.text = "冷却%d" % int(unit.current_cooldowns.get(skill.id, 0))
+		cd.add_theme_font_size_override("font_size", 11)
+		cd.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+		cd.offset_left = -40.0
+		cd.offset_top = -18.0
+		cd.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(cd)
+
+	btn.toggled.connect(_on_skill_toggled.bind(skill))
+	return btn
+
+
+func _on_skill_toggled(pressed: bool, skill: SkillData) -> void:
 	if _acting_unit == null:
 		return
-	_clear_target_outlines()
 
-	if _manager.needs_manual_target(skill):
-		_chosen_skill = skill
-		_hint_label.text = "选择「%s」的目标：" % skill.display_name
-		for target: BattleUnit in _manager.get_valid_targets(_acting_unit, skill):
-			var view: BattleUnitView = _views.get(target)
-			if view:
-				view.set_outline(BattleUnitView.TARGET_COLOR)
+	if pressed:
+		# 第一次点击：选中技能，弹出详情，高亮可选目标
+		if _selected_skill and _selected_skill != skill:
+			var prev: Button = _skill_buttons.get(_selected_skill)
+			if prev:
+				prev.set_pressed_no_signal(false)
+		_selected_skill = skill
+		_show_skill_detail(skill)
+		_clear_target_outlines()
+
+		if _manager.needs_manual_target(skill):
+			for target: BattleUnit in _manager.get_valid_targets(_acting_unit, skill):
+				var view: BattleUnitView = _views.get(target)
+				if view:
+					view.set_outline(BattleUnitView.TARGET_COLOR)
+			_hint_label.text = "点击目标释放「%s」，或再次点击图标释放（默认目标）" % skill.display_name
+		else:
+			_hint_label.text = "再次点击图标释放「%s」" % skill.display_name
 	else:
-		_submit(skill, null)
+		# 第二次点击同一技能：释放（单体技能命中默认目标）
+		if _selected_skill == skill:
+			_cast(skill, null)
 
 
 func _on_unit_view_clicked(unit: BattleUnit) -> void:
-	if _acting_unit == null or _chosen_skill == null:
+	if _acting_unit == null or _selected_skill == null:
 		return
-	if not _manager.get_valid_targets(_acting_unit, _chosen_skill).has(unit):
+	if not _manager.get_valid_targets(_acting_unit, _selected_skill).has(unit):
 		return
-	_submit(_chosen_skill, unit)
+	_cast(_selected_skill, unit)
 
 
-func _submit(skill: SkillData, target: BattleUnit) -> void:
+func _show_skill_detail(skill: SkillData) -> void:
+	_detail_text.clear()
+	_detail_text.append_text(FieldText.skill_bbcode(skill))
+	_detail_panel.visible = true
+
+
+func _cast(skill: SkillData, target: BattleUnit) -> void:
 	_end_input_phase()
 	_manager.submit_action(skill, target)
 
@@ -231,8 +394,12 @@ func _end_input_phase() -> void:
 			view.clear_outline()
 	_clear_target_outlines()
 	_acting_unit = null
-	_chosen_skill = null
-	_action_panel.visible = false
+	_selected_skill = null
+	_skill_buttons.clear()
+	for child in _skill_icons.get_children():
+		child.queue_free()
+	_detail_panel.visible = false
+	_hint_label.visible = false
 
 
 func _clear_target_outlines() -> void:
@@ -249,8 +416,8 @@ func _on_turn_started(turn_number: int) -> void:
 
 
 func _on_unit_acting(unit: BattleUnit, skill: SkillData, _targets: Array[BattleUnit]) -> void:
-	# 自动模式下切换行动时清理可能残留的输入态
-	if _acting_unit and _acting_unit != unit:
+	# 单位开始行动即意味着输入阶段结束（含切自动后 AI 代操作的情况）
+	if _acting_unit:
 		_end_input_phase()
 	var view: BattleUnitView = _views.get(unit)
 	if view:
@@ -279,6 +446,7 @@ func _on_unit_action(
 
 	if not target.is_alive:
 		_append_log("    %s 被击败！" % target.card.display_name)
+		_refresh_order_bar()
 
 
 func _on_unit_stunned(unit: BattleUnit) -> void:

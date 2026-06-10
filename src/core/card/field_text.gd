@@ -11,6 +11,15 @@ const BUFF_COLOR := "#7ec97e"
 const DEBUFF_COLOR := "#e88a6a"
 const SPECIAL_COLOR := "#8fb8de"
 
+const TARGET_NAMES := {
+	SkillData.TargetType.SELF: "自身",
+	SkillData.TargetType.SINGLE_ENEMY: "单体敌人",
+	SkillData.TargetType.ALL_ENEMIES: "全体敌人",
+	SkillData.TargetType.SINGLE_ALLY: "单体友方",
+	SkillData.TargetType.ALL_ALLIES: "全体友方",
+	SkillData.TargetType.RANDOM_ENEMY: "随机敌人",
+}
+
 ## 效果 key -> 文案模板；{v} 为数值，{p} 为百分比数值
 const EFFECT_TEMPLATES := {
 	"stun": "无法行动",
@@ -93,12 +102,17 @@ static func decorate_description(skill: SkillData) -> String:
 	return text
 
 
-## 纯文本版：技能描述 + 字段说明附录（用于 Button.tooltip_text 等场合）
-static func plain_tooltip(skill: SkillData) -> String:
-	var lines: PackedStringArray = [skill.description]
-	for field: FieldEntry in collect_skill_fields(skill):
-		lines.append("「%s」%s" % [field.display_name, describe(field)])
-	return "\n".join(lines)
+## 技能详情 BBCode：标题（目标 · 冷却）+ 字段高亮描述。图鉴与战斗详情共用。
+static func skill_bbcode(skill: SkillData) -> String:
+	var cd_text := "冷却 %d 回合" % skill.cooldown if skill.cooldown > 0 else "普通攻击"
+	var text := "[b]%s[/b]（%s · %s）" % [
+		skill.display_name,
+		TARGET_NAMES.get(skill.target, "未知"),
+		cd_text,
+	]
+	if skill.description != "":
+		text += "\n" + decorate_description(skill)
+	return text
 
 
 static func _fill(template: String, value: float) -> String:

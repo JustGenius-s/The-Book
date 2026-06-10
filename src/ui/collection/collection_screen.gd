@@ -4,15 +4,6 @@ extends Control
 
 const UNOWNED_TINT := Color(0.3, 0.3, 0.3)
 
-const TARGET_NAMES := {
-	SkillData.TargetType.SELF: "自身",
-	SkillData.TargetType.SINGLE_ENEMY: "单体敌人",
-	SkillData.TargetType.ALL_ENEMIES: "全体敌人",
-	SkillData.TargetType.SINGLE_ALLY: "单体友方",
-	SkillData.TargetType.ALL_ALLIES: "全体友方",
-	SkillData.TargetType.RANDOM_ENEMY: "随机敌人",
-}
-
 @onready var _grid: GridContainer = $Scroll/Grid
 @onready var _gold_label: Label = $TopBar/GoldLabel
 @onready var _detail_overlay: Control = $DetailOverlay
@@ -90,16 +81,7 @@ func _show_detail(card: CardData, owned: bool) -> void:
 
 	_detail_skills.clear()
 	for skill: SkillData in card.skills:
-		var cd_text := "冷却 %d 回合" % skill.cooldown if skill.cooldown > 0 else "普通攻击"
-		_detail_skills.append_text("[b]%s[/b]（%s · %s）\n" % [
-			skill.display_name,
-			TARGET_NAMES.get(skill.target, "未知"),
-			cd_text,
-		])
-		if skill.description != "":
-			# 字段名高亮展示，悬浮可查看字段效果
-			_detail_skills.append_text("%s\n\n" % FieldText.decorate_description(skill))
-		else:
-			_detail_skills.append_text("\n")
+		# 字段名高亮展示，悬浮可查看字段效果
+		_detail_skills.append_text("%s\n\n" % FieldText.skill_bbcode(skill))
 
 	_detail_overlay.visible = true

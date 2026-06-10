@@ -11,6 +11,8 @@ signal battle_ended(winner: String)
 ## 轮到我方单位且处于手动模式时发出，UI 应调用 submit_action() 提交行动
 signal action_requested(unit: BattleUnit)
 signal action_submitted
+## 本回合行动序列计算完成或行动进度推进时发出（配合 get_action_order/index 使用）
+signal action_order_changed
 
 enum BattleState { IDLE, RUNNING, FINISHED }
 
@@ -35,6 +37,8 @@ var _waiting_for_input: bool = false
 var _waiting_unit: BattleUnit
 var _pending_skill: SkillData
 var _pending_target: BattleUnit
+var _action_order: Array[BattleUnit] = []
+var _action_index: int = -1
 
 
 func setup_battle(
@@ -98,6 +102,15 @@ func is_ally(unit: BattleUnit) -> bool:
 	return _ally_units.has(unit)
 
 
+## 当前回合的行动序列与进度（供行动条 UI 使用）
+func get_action_order() -> Array[BattleUnit]:
+	return _action_order
+
+
+func get_action_index() -> int:
+	return _action_index
+
+
 ## 该技能是否需要玩家手动指定目标
 func needs_manual_target(skill: SkillData) -> bool:
 	return skill.target == SkillData.TargetType.SINGLE_ENEMY \
@@ -144,11 +157,16 @@ func _run_battle() -> void:
 		turn_number += 1
 		turn_started.emit(turn_number)
 
-		var action_order := _get_action_order()
+		_action_order = _get_action_order()
+		_action_index = -1
+		action_order_changed.emit()
 
-		for unit: BattleUnit in action_order:
+		for i in _action_order.size():
+			var unit := _action_order[i]
 			if state != BattleState.RUNNING:
 				return
+			_action_index = i
+			action_order_changed.emit()
 			if not unit.is_alive:
 				continue
 
