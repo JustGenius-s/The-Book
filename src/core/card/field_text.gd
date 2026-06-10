@@ -188,6 +188,8 @@ static func trait_bbcode(trait_data: TraitData) -> String:
 
 	for effect: TraitEffect in trait_data.effects:
 		var target_name: String = TRAIT_TARGET_NAMES.get(effect.target, "未知目标")
+		if effect.switch_to_form != "":
+			lines.append("切换形态为【%s】" % _card_display_name(effect.switch_to_form))
 		for field: FieldEntry in effect.fields_to_apply:
 			lines.append("%s施加：%s" % [target_name, field_bbcode(field)])
 		for field_id: String in effect.fields_to_remove:

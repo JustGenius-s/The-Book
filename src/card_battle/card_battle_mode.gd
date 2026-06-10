@@ -325,8 +325,16 @@ func _add_view(unit: BattleUnit, column: VBoxContainer, mirrored: bool) -> void:
 	var view := BattleUnitView.new()
 	view.setup(unit, mirrored)
 	view.clicked.connect(_on_unit_view_clicked)
+	unit.form_changed.connect(_on_unit_form_changed)
 	column.add_child(view)
 	_views[unit] = view
+
+
+func _on_unit_form_changed(_unit: BattleUnit, old_card: CardData, new_card: CardData) -> void:
+	_append_log("[color=%s]%s 形态变化 → %s！[/color]" % [
+		FieldText.TRAIT_COLOR, old_card.display_name, new_card.display_name,
+	])
+	_refresh_order_bar()
 
 
 # ---------- 行动条 ----------

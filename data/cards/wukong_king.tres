@@ -33,6 +33,7 @@ script = ExtResource("2_0vnpy")
 id = "wukong_king"
 display_name = "美猴王"
 book_id = "journey_to_the_west"
+character_id = "wukong"
 rarity = 4
 base_hp = 1100
 base_atk = 175

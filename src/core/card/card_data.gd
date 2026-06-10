@@ -6,6 +6,8 @@ extends Resource
 @export var book_id: String
 @export var rarity: int = 1
 @export var tags: Array[String] = []
+## 所属角色 id，同 character_id 的卡互为形态（可在战斗中切换）；空 = 无形态系统的独立卡
+@export var character_id: String = ""
 
 @export_group("Stats")
 @export var base_hp: int = 100

@@ -3,6 +3,7 @@ extends Node2D
 
 signal died(unit: BattleUnit)
 signal hp_changed(unit: BattleUnit, old_hp: int, new_hp: int)
+signal form_changed(unit: BattleUnit, old_card: CardData, new_card: CardData)
 
 var card: CardData
 var equipment: Array[EquipmentData] = []
@@ -65,6 +66,62 @@ func heal(amount: int) -> void:
 	hp_changed.emit(self, old_hp, current_hp)
 
 
+## 形态切换：换卡并按策略过渡 HP/技能冷却/字段，装备按新形态重新匹配。
+## 调用方（TraitProcessor）负责校验 character_id 一致。
+func switch_form(
+	new_card: CardData,
+	hp_policy: TraitEffect.HpPolicy = TraitEffect.HpPolicy.KEEP_PERCENT,
+	cooldown_policy: TraitEffect.CooldownPolicy = TraitEffect.CooldownPolicy.INHERIT_BY_ID,
+	field_policy: TraitEffect.FieldPolicy = TraitEffect.FieldPolicy.KEEP_ALL,
+) -> void:
+	if not is_alive or new_card == null or new_card == card:
+		return
+
+	var old_card := card
+	var hp_ratio := float(current_hp) / float(max_hp) if max_hp > 0 else 1.0
+	var old_cooldowns := current_cooldowns
+
+	card = new_card
+	max_hp = _calc_base_stat("hp")
+
+	match hp_policy:
+		TraitEffect.HpPolicy.KEEP_PERCENT:
+			current_hp = clampi(ceili(float(max_hp) * hp_ratio), 1, max_hp)
+		TraitEffect.HpPolicy.KEEP_VALUE:
+			current_hp = clampi(current_hp, 1, max_hp)
+		TraitEffect.HpPolicy.FULL_RESTORE:
+			current_hp = max_hp
+
+	current_cooldowns = {}
+	for skill: SkillData in card.skills:
+		match cooldown_policy:
+			TraitEffect.CooldownPolicy.INHERIT_BY_ID:
+				current_cooldowns[skill.id] = old_cooldowns.get(skill.id, 0)
+			TraitEffect.CooldownPolicy.RESET_ALL:
+				current_cooldowns[skill.id] = 0
+			TraitEffect.CooldownPolicy.ALL_ON_COOLDOWN:
+				# 各技能进入自身冷却时长（普攻 cooldown=0 不受影响）
+				current_cooldowns[skill.id] = skill.cooldown
+
+	match field_policy:
+		TraitEffect.FieldPolicy.CLEAR_DEBUFFS:
+			_clear_fields_of_type(FieldEntry.FieldType.DEBUFF)
+		TraitEffect.FieldPolicy.CLEAR_BUFFS:
+			_clear_fields_of_type(FieldEntry.FieldType.BUFF)
+		TraitEffect.FieldPolicy.CLEAR_ALL:
+			field_container.clear_all()
+		_:
+			pass
+
+	# 装备按新形态重新匹配（羁绊角色可能变化）
+	field_container.clear_by_source(FieldEntry.FieldSource.EQUIPMENT)
+	_apply_equipment_innate_fields()
+
+	# diff 为 0 不会触发伤害/治疗弹窗，仅让 UI 刷新血量显示
+	hp_changed.emit(self, current_hp, current_hp)
+	form_changed.emit(self, old_card, card)
+
+
 func process_turn_start() -> void:
 	var dot := FieldResolver.collect_dot_damage(field_container, global_fields)
 	if dot > 0:
@@ -98,6 +155,11 @@ func check_equip_triggers(event: EquipTrigger.TriggerEvent) -> Array[EquipTrigge
 			if trigger.event == event and randf() <= trigger.chance:
 				triggered.append(trigger)
 	return triggered
+
+
+func _clear_fields_of_type(type: FieldEntry.FieldType) -> void:
+	for entry: FieldEntry in field_container.get_fields_by_type(type):
+		field_container.remove_field(entry.id)
 
 
 func _calc_base_stat(stat_name: String) -> int:

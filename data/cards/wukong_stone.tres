@@ -5,6 +5,8 @@
 [ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_esrd8"]
 [ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_wmg5i"]
 [ext_resource type="Resource" path="res://data/fields/stone_skin.tres" id="5_jd2py"]
+[ext_resource type="Script" path="res://src/core/character/trait_data.gd" id="6_trd"]
+[ext_resource type="Resource" path="res://data/traits/lieyan_mohua.tres" id="7_lymh"]
 
 [sub_resource type="Resource" id="Resource_5ep4i"]
 script = ExtResource("3_esrd8")
@@ -28,10 +30,12 @@ script = ExtResource("2_j4l5a")
 id = "wukong_stone"
 display_name = "石猴"
 book_id = "journey_to_the_west"
+character_id = "wukong"
 rarity = 2
 base_hp = 1400
 base_atk = 105
 base_def = 95
 base_spd = 88
 skills = Array[ExtResource("3_esrd8")]([SubResource("Resource_5ep4i"), SubResource("Resource_vj3p6")])
+traits = Array[ExtResource("6_trd")]([ExtResource("7_lymh")])
 portrait = ExtResource("1_pbdse")

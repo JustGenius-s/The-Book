@@ -32,6 +32,7 @@ script = ExtResource("2_tvber")
 id = "wukong_dragon"
 display_name = "龙宫猴"
 book_id = "journey_to_the_west"
+character_id = "wukong"
 rarity = 3
 base_hp = 1000
 base_atk = 110

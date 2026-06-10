@@ -92,6 +92,7 @@ func setup(p_unit: BattleUnit, mirrored: bool = false) -> void:
 
 	unit.hp_changed.connect(_on_hp_changed)
 	unit.died.connect(_on_died)
+	unit.form_changed.connect(_on_form_changed)
 
 	var fc := unit.field_container
 	fc.field_added.connect(func(_entry: FieldEntry) -> void: _refresh_fields())
@@ -141,6 +142,20 @@ func _on_hp_changed(_unit: BattleUnit, old_hp: int, new_hp: int) -> void:
 	var diff := new_hp - old_hp
 	if diff != 0:
 		_spawn_popup(diff)
+
+
+func _on_form_changed(_unit: BattleUnit, _old_card: CardData, new_card: CardData) -> void:
+	_portrait.texture = new_card.portrait
+	_name_label.text = new_card.display_name
+	_hp_bar.max_value = unit.max_hp
+	_update_hp_display()
+	_refresh_fields()
+
+	# 变身提示：短促的放大回弹
+	pivot_offset = size / 2.0
+	var tween := create_tween()
+	tween.tween_property(self, "scale", Vector2(1.18, 1.18), 0.15)
+	tween.tween_property(self, "scale", Vector2.ONE, 0.22)
 
 
 func _on_died(_unit: BattleUnit) -> void:

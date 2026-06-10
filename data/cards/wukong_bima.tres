@@ -28,6 +28,7 @@ script = ExtResource("2_ju6v3")
 id = "wukong_bima"
 display_name = "弼马温"
 book_id = "journey_to_the_west"
+character_id = "wukong"
 rarity = 2
 base_hp = 950
 base_atk = 120
