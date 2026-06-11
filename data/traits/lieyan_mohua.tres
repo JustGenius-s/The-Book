@@ -12,7 +12,7 @@ value = "flame_qi"
 [sub_resource type="Resource" id="Resource_eff1"]
 script = ExtResource("3_tre")
 target = 0
-switch_to_form = "wukong_demon"
+switch_to_form = "wukong_sage"
 
 [resource]
 script = ExtResource("1_trd")
@@ -20,4 +20,4 @@ id = "lieyan_mohua"
 display_name = "烈焰魔化"
 conditions = Array[ExtResource("2_trc")]([SubResource("Resource_cond1")])
 effects = Array[ExtResource("3_tre")]([SubResource("Resource_eff1")])
-description = "顽石藏魔性，遇火则显。身处焰天火场期间，石猴魔化为魔猴形态，离开火场后恢复本相。"
+description = "仙石历炼火，方显大圣威。身处焰天火场期间，石猴觉醒为齐天大圣形态，离开火场后恢复本相。"

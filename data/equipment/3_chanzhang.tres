@@ -22,6 +22,6 @@ stat_bonuses = {
 "atk": 15
 }
 passive_triggers = Array[ExtResource("2_7spt3")]([SubResource("Resource_al63x")])
-synergy_character = "wukong_monk"
+synergy_character = "wukong_pilgrim"
 synergy_fields = Array[ExtResource("1_dtjv8")]([ExtResource("5_fyi8b")])
-description = "佛门法器，回合开始 50% 概率恢复少量生命。羁绊角色：取经猴"
+description = "佛门法器，回合开始 50% 概率恢复少量生命。羁绊角色：孙行者"

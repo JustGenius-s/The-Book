@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/qitiandasheng.png" id="1_port"]
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_cd"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_sk"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_fe"]
+[ext_resource type="Resource" path="res://data/fields/stun.tres" id="5_stun"]
+[ext_resource type="Resource" path="res://data/fields/burn.tres" id="6_burn"]
+[ext_resource type="Script" path="res://src/core/character/trait_data.gd" id="7_trd"]
+[ext_resource type="Resource" path="res://data/traits/dinghai_shenzhen.tres" id="8_dh"]
+
+[sub_resource type="Resource" id="Resource_jgb"]
+script = ExtResource("3_sk")
+id = "jingubang"
+display_name = "齐天大圣"
+damage_multiplier = 1.1
+description = "如意金箍棒，重一万三千五百斤——猛击单个敌人。"
+
+[sub_resource type="Resource" id="Resource_nao"]
+script = ExtResource("3_sk")
+id = "danao_tiangong"
+display_name = "大闹天宫"
+target = 2
+cooldown = 4
+damage_multiplier = 1.3
+fields_to_apply = Array[ExtResource("4_fe")]([ExtResource("5_stun")])
+terrain_to_create = "flame_domain"
+description = "打得那九曜星闭门闭户——攻击所有敌人并使随机目标眩晕，化场地为焰天火场。"
+
+[resource]
+script = ExtResource("2_cd")
+id = "wukong_sage"
+display_name = "齐天大圣"
+book_id = "journey_to_the_west"
+character_id = "wukong"
+rarity = 5
+base_hp = 1500
+base_atk = 185
+base_def = 85
+base_spd = 110
+skills = Array[ExtResource("3_sk")]([SubResource("Resource_jgb"), SubResource("Resource_nao")])
+traits = Array[ExtResource("7_trd")]([ExtResource("8_dh")])
+portrait = ExtResource("1_port")

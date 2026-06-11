@@ -23,6 +23,6 @@ stat_bonuses = {
 "def": 15
 }
 passive_triggers = Array[ExtResource("2_qva4t")]([SubResource("Resource_a3iwh")])
-synergy_character = "wukong_demon"
+synergy_character = "wukong_sage"
 synergy_fields = Array[ExtResource("1_pgcps")]([ExtResource("5_kfu3n")])
-description = "刻满经文的护符，回合开始 40% 概率生成护盾。羁绊角色：魔猴"
+description = "刻满经文的护符，回合开始 40% 概率生成护盾。羁绊角色：齐天大圣"

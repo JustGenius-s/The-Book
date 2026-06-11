@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/xueyihou.png" id="1_port"]
+[ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_cd"]
+[ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_sk"]
+[ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_fe"]
+[ext_resource type="Resource" path="res://data/fields/burn.tres" id="5_burn"]
+
+[sub_resource type="Resource" id="Resource_xz"]
+script = ExtResource("3_sk")
+id = "xingzhe_bang"
+display_name = "孙行者"
+damage_multiplier = 0.95
+description = "虎皮裙，金箍棒——肩扛如意棒攻击单个敌人。"
+
+[sub_resource type="Resource" id="Resource_jgz"]
+script = ExtResource("3_sk")
+id = "jinggu_zhou"
+display_name = "紧箍咒缚"
+target = 1
+cooldown = 3
+damage_multiplier = 0.6
+heal_multiplier = 1.2
+fields_to_remove = Array[String](["burn"])
+description = "心净孤明独照——攻击敌人的同时治疗自身并驱散灼烧。"
+
+[resource]
+script = ExtResource("2_cd")
+id = "wukong_pilgrim"
+display_name = "孙行者"
+book_id = "journey_to_the_west"
+character_id = "wukong"
+rarity = 4
+base_hp = 1200
+base_atk = 145
+base_def = 75
+base_spd = 108
+skills = Array[ExtResource("3_sk")]([SubResource("Resource_xz"), SubResource("Resource_jgz")])
+portrait = ExtResource("1_port")

@@ -22,4 +22,4 @@ id = "ruoshui"
 display_name = "弱水"
 conditions = Array[ExtResource("2_trc")]([SubResource("Resource_cond1")])
 effects = Array[ExtResource("3_tre")]([SubResource("Resource_eff1")])
-description = "魔气遇弱水则衰。身处龙宫水域时，魔猴被水脉压制，攻击下降且持续受创。"
+description = "仙气遇弱水则衰。身处龙宫水域时，被水脉压制，攻击下降且持续受创。"

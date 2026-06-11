@@ -5,7 +5,7 @@ const SAVE_PATH := "user://saves/player.json"
 ## 新档默认发放的卡牌，同时作为默认编队
 const STARTER_CARDS: Array[String] = ["pangu", "nuwa", "yuhuangdadi"]
 ## 旧版初始卡牌，用于存档迁移
-const OLD_STARTER_CARDS: Array[String] = ["wukong_king", "wukong_monk", "wukong_stone"]
+const OLD_STARTER_CARDS: Array[String] = ["wukong_king", "wukong_monk", "wukong_pilgrim", "wukong_stone"]
 ## 新档默认发放的装备
 const STARTER_EQUIPS: Array[String] = ["1_ruyi_bang", "5_suozijia"]
 ## 新档初始金币（够进商店买件入门装备）
@@ -25,14 +25,21 @@ func _ensure_starter_content() -> void:
 		_grant_starters()
 	else:
 		_migrate_if_needed()
+	_unlock_all_cards()
 	if player.card_battle_team.is_empty():
 		player.card_battle_team.assign(STARTER_CARDS)
 	save_game()
 
 
+func _unlock_all_cards() -> void:
+	for card: CardData in CardLibrary.get_all_cards():
+		if not player.has_card(card.id):
+			player.grant_card(card.id)
+
+
 func _grant_starters() -> void:
-	for card_id: String in STARTER_CARDS:
-		player.grant_card(card_id)
+	for card: CardData in CardLibrary.get_all_cards():
+		player.grant_card(card.id)
 	for equip_id: String in STARTER_EQUIPS:
 		player.grant_equip(equip_id)
 	player.add_currency("gold", STARTER_GOLD)

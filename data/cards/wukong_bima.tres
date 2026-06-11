@@ -1,27 +1,31 @@
 [gd_resource type="Resource" script_class="CardData" format=3]
 
-[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/弼马温.png" id="1_tlonw"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/bimawen.png" id="1_tlonw"]
 [ext_resource type="Script" path="res://src/core/card/card_data.gd" id="2_ju6v3"]
 [ext_resource type="Script" path="res://src/core/character/skill.gd" id="3_erk70"]
 [ext_resource type="Script" path="res://src/core/card/field_entry.gd" id="4_d8vfh"]
 [ext_resource type="Resource" path="res://data/fields/war_cry.tres" id="5_4btqj"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/skills/bimawen/weiruliu.png" id="6_sk0"]
+[ext_resource type="Texture2D" path="res://assets/books/journey_to_the_west/characters/wukong/skills/bimawen/zhouyeyinqin.png" id="7_sk1"]
 
 [sub_resource type="Resource" id="Resource_pjejw"]
 script = ExtResource("3_erk70")
-id = "whip"
-display_name = "鞭笞"
+id = "weiruliu"
+display_name = "未入流"
+icon = ExtResource("6_sk0")
 damage_multiplier = 0.9
-description = "挥鞭抽打单个敌人。"
+description = "昼夜不睡，滋养马匹——挥鞭抽打单个敌人。"
 
 [sub_resource type="Resource" id="Resource_ox7nr"]
 script = ExtResource("3_erk70")
-id = "horse_rage"
-display_name = "马威"
+id = "xingao"
+display_name = "心高"
+icon = ExtResource("7_sk1")
 target = 0
 cooldown = 3
 damage_multiplier = 0.0
 fields_to_self = Array[ExtResource("4_d8vfh")]([ExtResource("5_4btqj")])
-description = "发出战吼，自身攻击力提升 30%。"
+description = "这般藐视老孙！——推倒公案，自身攻击力提升 30%。"
 
 [resource]
 script = ExtResource("2_ju6v3")
